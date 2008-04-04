@@ -1,9 +1,8 @@
-require "Sexp"
+require "sexp"
 
 class SexpParser
   def initialize(str)
-    @sexp = Sexp.new(str)
-    @sexp_array = @sexp.getAry
+    @sexp_array = str.parse_sexp
   end
   
   def import

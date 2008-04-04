@@ -25,6 +25,9 @@ module EventsControllerSpecHelper
     Event.stub!(:find).and_return([@event])
     @fy = mock_model(FiscalYear)
     FiscalYear.stub!(:find).and_return(@fy)
+    @events = [@event]
+    @events.stub!(:find).and_return(@events)
+    @fy.stub!(:events).and_return(@events)
   end
 end
 
@@ -88,7 +91,7 @@ describe EventsController, " handling GET /events" do
   it_should_behave_like "GET /events general"
   
   it "should find all events" do
-    Event.should_receive(:find).with(:all, 
+    @events.should_receive(:find).with(:all, 
                         :order => "event_date, receipt_number").and_return([@event])
     do_get
   end
@@ -109,7 +112,7 @@ describe EventsController, " handling GET /events with start_date" do
   it_should_behave_like "GET /events general"
 
   it "should find all events" do
-    Event.should_receive(:find).with(:all, 
+    @events.should_receive(:find).with(:all, 
                       :order => "event_date, receipt_number",
                       :conditions => ["event_date >= ?", "2007-08-03"]).and_return([@event])
     do_get
@@ -130,7 +133,7 @@ describe EventsController, " handling GET /events with end_date" do
   it_should_behave_like "GET /events general"
 
   it "should find all events" do
-    Event.should_receive(:find).with(:all, 
+    @events.should_receive(:find).with(:all, 
                       :order => "event_date, receipt_number",
                       :conditions => ["event_date <= ?", "2007-08-03"]).and_return([@event])
     do_get
@@ -151,7 +154,7 @@ describe EventsController, " handling GET /events with start_date and end_date" 
   it_should_behave_like "GET /events general"
 
   it "should find all events" do
-    Event.should_receive(:find).with(:all, 
+    @events.should_receive(:find).with(:all, 
                       :order => "event_date, receipt_number",
                       :conditions => ["event_date >= ? and event_date <= ?", "2007-08-01", "2007-08-03"]).and_return([@event])
     do_get
@@ -361,15 +364,21 @@ describe EventsController, " handling POST /events" do
     FiscalYear.stub!(:find).and_return(@fy)
     @event = Event.new
     @event.stub!(:to_param).and_return("69")
-    @event.should_receive(:save).and_return(true)
-    Event.should_receive(:new).and_return(@event)
+    @event.stub!(:save).and_return(true)
+    @events = [@event]
+    @events.stub!(:build).and_return(@event)
+    @fy.stub!(:events).and_return(@events)
   end
 
   it "should create new Event" do
+    @events.should_receive(:build).
+        with(valid_attributes[:event].stringify_keys).
+        and_return(@event)
     do_post
   end
   
   it "should save the event" do
+    @event.should_receive(:save).and_return(true)
     do_post
   end
   
@@ -392,69 +401,37 @@ describe EventsController, " handling POST /events" do
     do_post
     flash[:notice].should == 'Event was successfully created.'
   end
-end
 
-describe EventsController, " handling POST /events when saving fails" do
-  include EventsControllerSpecHelper
-
-  before(:each) do
-    @fy = mock_model(FiscalYear, :id => 6)
-    @fy.stub!(:to_param).and_return("6")
-    FiscalYear.stub!(:find).and_return(@fy)
-    @event = Event.new
-    @event.stub!(:to_param).and_return("69")
-    @event.should_receive(:save).and_return(false)
-    Event.should_receive(:new).and_return(@event)
+  describe "when saving fails" do
+    before(:each) do
+      @event.should_receive(:save).and_return(false)
+      @a1 = mock_model(Account, :title => "foo", :id => 1)
+      @a2 = mock_model(Account, :title => "bar", :id => 2)
+      @accounts = [@a1, @a2]
+      Account.stub!(:find_for_dropdown).and_return(@accounts)
+    end
     
-    @a1 = mock_model(Account, :title => "foo", :id => 1)
-    @a2 = mock_model(Account, :title => "bar", :id => 2)
-    @accounts = [@a1, @a2]
-    Account.stub!(:find_for_dropdown).and_return(@accounts)
-  end
-  
-  it "should show the form again" do
-    do_post
-    response.should render_template("new")
-  end
-  
-  it "should show correct flash" do
-    do_post
-    flash[:warning].should == 'Saving event failed.'
-  end
-  
-  it "should set event lines correctly" do
-    do_post
-    assigns[:lines].should == @event.event_lines
-  end
-  
-  it "should set accounts correctly" do
-    do_post
-    assigns[:accounts].should == @accounts
+    it "should show the form again" do
+      do_post
+      response.should render_template("new")
+    end
+
+    it "should show correct flash" do
+      do_post
+      flash[:warning].should == 'Saving event failed.'
+    end
+
+    it "should set event lines correctly" do
+      do_post
+      assigns[:lines].should == @event.event_lines
+    end
+
+    it "should set accounts correctly" do
+      do_post
+      assigns[:accounts].should == @accounts
+    end
   end
 end
-
-#describe EventsController, " handling POST /events" do
-#
-#  before do
-#    @event = mock_model(Event, :to_param => "1", :save => true)
-#    Event.stub!(:new).and_return(@event)
-#    @params = {}
-#  end
-#  
-#  def do_post
-#    post :create, :event => @params, :fiscal_year_id => 1
-#  end
-#  
-#  it "should create a new event" do
-#    Event.should_receive(:new).with(@params).and_return(@event)
-#    do_post
-#  end
-#
-#  it "should redirect to the new event" do
-#    do_post
-#    response.should redirect_to(event_url(1, "1"))
-#  end
-#end
 
 #describe EventsController, " handling PUT /events/1" do
 #

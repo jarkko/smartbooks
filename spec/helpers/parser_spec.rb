@@ -1,4 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
+require File.dirname(__FILE__) + '/../../lib/sexp_parser'
+
 
 module SampleData
   def sample
@@ -83,8 +85,7 @@ describe Account, "parsing" do
   include SampleData
   
   before(:each) do
-    @sexp = Sexp.new(sample)
-    @accounts = @sexp.getAry[5][4]
+    @accounts = sample.parse_sexp[5][4]
     @fy = fiscal_years(:year2007)
   end
   
@@ -115,8 +116,7 @@ describe Event, "calling parse_events" do
   include SampleData
   
   before(:each) do
-    @sexp = Sexp.new(sample)
-    @events = @sexp.getAry[5][5]
+    @events = sample.parse_sexp[5][5]
     Event.stub!(:parse_event)
     @fy = mock_model(FiscalYear)
   end
@@ -133,33 +133,33 @@ describe Event, "calling parse_event" do
   
   before(:each) do
     @fy = fiscal_years(:year2007)
-    @sexp = Sexp.new(sample)
+    @events = sample.parse_sexp[5][5]
   end
   
   it "should save event" do
     lambda {
-      Event.parse_event(@fy, @sexp.getAry[5][5].first)
+      Event.parse_event(@fy, @events.first)
     }.should change(Event, :count).by(1)
   end
   
   it "should put the event to the correct fiscal year" do
-    @event = Event.parse_event(@fy, @sexp.getAry[5][5].first)
+    @event = Event.parse_event(@fy, @events.first)
     @fy.reload.events.should include(@event)
   end
   
   it "should add correct date" do
-    @event = Event.parse_event(@fy, @sexp.getAry[5][5].first)
+    @event = Event.parse_event(@fy, @events.first)
     @event.event_date.should == Date.new(2003,1,1)
   end
   
   it "should add correct description" do
-    @event = Event.parse_event(@fy, @sexp.getAry[5][5].first)
+    @event = Event.parse_event(@fy, @events.first)
     @event.description.should == "Tilinavaus"
   end
   
   it "should add two new event lines" do
     lambda {
-      @event = Event.parse_event(@fy, @sexp.getAry[5][5].first)
+      @event = Event.parse_event(@fy, @events.first)
     }.should change(EventLine, :count).by(2)
   end
 end
