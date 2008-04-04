@@ -29,7 +29,10 @@
     <ul class="event_lines">
       <% for event_line in event.event_lines %>
       <li>
-        <span class="event_line_account"><%= link_to event_line.account.title, event_line.account %></span>
+        <span class="event_line_account">
+          <%= link_to event_line.account.title, 
+                      fiscal_year_account_path(@fiscal_year, event_line.account) %>
+        </span>
         <%= colored_sum(event_line.sum) %>
       </li>
       <% end %>

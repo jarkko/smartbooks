@@ -35,7 +35,7 @@ describe "/events/index.rhtml" do
     end
     
     assigns[:events] = @events
-    assigns[:fiscal_year] = mock_model(FiscalYear)
+    assigns[:fiscal_year] = @fy = mock_model(FiscalYear)
   end
 
   it "should render list of events" do
@@ -47,7 +47,7 @@ describe "/events/index.rhtml" do
         
         with_tag('ul.event_lines') do
           with_tag('li', /-20\.00/) do
-            with_tag "a[href=#{account_path(@account_1)}]", @account_1.title
+            with_tag "a[href=#{fiscal_year_account_path(@fy, @account_1)}]", @account_1.title
           end
         end
       end
