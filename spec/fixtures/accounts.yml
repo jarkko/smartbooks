@@ -1,0 +1,40 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+vastaavaa:
+  id: 1
+  title: Vastaavaa
+  account_number: -1
+  fiscal_year_id: 1
+pankkitili:
+  id: 2
+  title: Pankkitili
+  account_number: 101
+  parent_id: 1
+  fiscal_year_id: 1
+vastattavaa:
+  id: 3
+  title: Vastattavaaf
+  account_number: -1
+  fiscal_year_id: 1
+oma_paaoma:
+  id: 4
+  title: Oma Pääomaf
+  account_number: 201
+  parent_id: 3
+  fiscal_year_id: 1
+tulos:
+  id: 5
+  title: Tulosf
+  account_number: -1
+  fiscal_year_id: 1
+tulot:
+  id: 6
+  title: Tulotf
+  account_number: 300
+  fiscal_year_id: 1
+  parent_id: 5
+menot:
+  id: 7
+  title: Menotfs
+  account_number: 400
+  parent_id: 5
+  fiscal_year_id: 1

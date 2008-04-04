@@ -1,0 +1,40 @@
+8
+
+dir
+1593
+svn+ssh://dev1.dotherightthing.com/home/svn/buttonwood/branches/friendships/vendor/plugins/sexy_migrations/lib
+svn+ssh://dev1.dotherightthing.com/home/svn/buttonwood
+
+
+
+2007-04-19T12:43:57.297819Z
+1576
+jarkko
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+a97149f8-9415-0410-aa8c-e4cacc358a2c
+
+sexy_migrations.rb
+file
+
+
+
+
+2007-04-19T09:23:59.000000Z
+e167679888484fcc2517580abc2fd77a
+2007-04-19T12:43:57.297819Z
+1576
+jarkko
+

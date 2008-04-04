@@ -1,0 +1,58 @@
+8
+
+dir
+1593
+svn+ssh://dev1.dotherightthing.com/home/svn/buttonwood/branches/friendships/vendor/plugins/exception_notification
+svn+ssh://dev1.dotherightthing.com/home/svn/buttonwood
+
+
+
+2007-02-20T12:37:12.491511Z
+1531
+jarkko
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+a97149f8-9415-0410-aa8c-e4cacc358a2c
+
+init.rb
+file
+
+
+
+
+2007-04-19T06:37:43.000000Z
+d68a35cf6df012c7fd6562da6355a201
+2007-02-20T12:37:12.491511Z
+1531
+jarkko
+
+lib
+dir
+
+views
+dir
+
+README
+file
+
+
+
+
+2007-04-19T06:37:43.000000Z
+fe84727e1adb78f3b7c59207d612720b
+2007-02-20T12:37:12.491511Z
+1531
+jarkko
+

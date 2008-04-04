@@ -1,0 +1,8 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+year2007:
+  id: 1
+  description: Year 2007
+  start_date: 2007-01-01
+  end_date: 2007-12-31
+two:
+  id: 2

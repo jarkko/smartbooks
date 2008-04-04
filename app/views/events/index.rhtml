@@ -1,0 +1,44 @@
+<% content_for :javascript do %>
+  <%= javascript_include_tag 'date_selector', 'fiscal_years/index' %>
+<% end %>
+<h1>Listing events</h1>
+
+<p>
+  <%= link_to "Add new event", new_fiscal_year_event_path(@fiscal_year), :accesskey => "n" %>
+</p>
+
+<% form_tag({}, :method => 'get') do %>
+<p>
+  Limit the time frame: <%= text_field_tag "start_date", params[:start_date], :class => 'date' %> to <%= text_field_tag "end_date", params[:end_date], :class => 'date' %>
+  <%= submit_tag "Limit" %>
+</p>
+<% end %>
+
+<ul id="events">
+<% for event in @events %>
+
+  <li id="event_<%= event.id %>">
+    <h4>
+      <span class="event_date"><%= event.event_date.to_s %></span>
+      <span class="event_id"><%= event.receipt_number %></span>
+      <span class="description">
+        <%=h event.description %>
+      </span>
+    </h4>
+    
+    <ul class="event_lines">
+      <% for event_line in event.event_lines %>
+      <li>
+        <span class="event_line_account"><%= link_to event_line.account.title, event_line.account %></span>
+        <%= colored_sum(event_line.sum) %>
+      </li>
+      <% end %>
+    </ul>
+  </li>
+
+<% end %>
+</ul>
+
+<p>
+  <%= link_to "Add new event", new_fiscal_year_event_path(@fiscal_year) %>
+</p>
