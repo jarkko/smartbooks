@@ -1,0 +1,5 @@
+--- 
+vendor/plugins/rspec: 
+  local_branch: braid/svn/vendor/plugins/rspec
+  type: svn
+  remote: http://rspec.rubyforge.org/svn/trunk/rspec
