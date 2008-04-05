@@ -1,6 +1,7 @@
 class Account < ActiveRecord::Base
   acts_as_tree :order => "account_number"
   has_many :event_lines
+  belongs_to :fiscal_year
   
   def self.parse_array(fiscal_year, arr, parent = nil)
     new_account = fiscal_year.accounts.create!(:account_number => arr[1],
@@ -39,5 +40,27 @@ class Account < ActiveRecord::Base
     else
       self.event_lines.sum(:amount) || 0
     end
+  end
+  
+  def total(opts = {})
+    sql_opts = {}
+    if opts[:month]
+      
+      if opts[:month].is_a?(Range)
+        first = opts[:month].first.to_i
+        last = Date.new(fiscal_year.start_date.year, opts[:month].last.to_i, 1)
+        end_date = 1.month.since(last).yesterday
+      else
+        first = opts[:month].to_i
+      end
+      
+      start_date = Date.new(fiscal_year.start_date.year, first, 1)
+      end_date ||= 1.month.since(start_date).yesterday
+      
+      sql_opts = {:joins => "join events on event_lines.event_id = events.id",
+                  :conditions => "event_date between '#{start_date.to_s(:db)}' and '#{end_date.to_s(:db)}'"}
+    end
+    
+    sprintf("%+.2f", (event_lines.sum(:amount, sql_opts) || 0) / 100.0)
   end
 end

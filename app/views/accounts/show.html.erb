@@ -1,0 +1,21 @@
+<% @page_title = "#{@fiscal_year.description}: #{@account.title}" %>
+<h1>
+  <%= @account.title %>
+</h1>
+
+<% unless @account.event_lines.empty? %>
+<table>
+  <% @account.event_lines.sort_by{|l| l.event.event_date}.each do |line| %>
+    <tr>
+      <td><%= line.event.event_date %></td>
+      <td><%= line.event.receipt_number %></td>
+      <td><%= line.event.description %></td>
+      <td><%= colored_sum(line.sum) %></td>
+    </tr>
+  <% end %>
+</table>
+<% end %>
+
+<p id="total">
+  <%= colored_sum(@account.total) %>
+</p>

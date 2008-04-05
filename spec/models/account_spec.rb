@@ -41,3 +41,50 @@ describe Account, "calling find_for_dropdown" do
     (@accounts & @virtual_accounts).should be_empty
   end
 end
+
+describe Account do
+  before(:each) do
+    @account = Account.new
+  end
+
+  describe "total" do
+    before(:each) do
+      @line1 = mock_model(EventLine, :amount => 6900)
+      @line2 = mock_model(EventLine, :amount => -1300)
+      @lines = [@line1, @line2]
+      @account.stub!(:event_lines).and_return(@lines)
+      @fiscal_year = mock_model(FiscalYear,
+                                :start_date => Date.new(2007,1,1),
+                                :end_date => Date.new(2007,12,31))
+      @account.fiscal_year = @fiscal_year
+    end
+    
+    describe "without month set" do
+      before(:each) do
+        @lines.stub!(:sum).and_return(5600)
+      end
+
+      it "should return the sum of all the lines" do
+        @account.total.should == "+56.00"
+      end
+    end
+    
+    describe "with month option set" do
+      it "should restrict to events within the time frame" do
+        @lines.should_receive(:sum).with(:amount,
+                    :joins => "join events on event_lines.event_id = events.id", 
+                    :conditions => "event_date between '2007-08-01' and '2007-08-31'")
+        @account.total(:month => "8")
+      end
+    end
+    
+    describe "with month option set to a range" do
+      it "should restrict to events within the time frame" do
+        @lines.should_receive(:sum).with(:amount,
+                    :joins => "join events on event_lines.event_id = events.id", 
+                    :conditions => "event_date between '2007-01-01' and '2007-10-31'")
+        @account.total(:month => 1..10)
+      end
+    end
+  end
+end
