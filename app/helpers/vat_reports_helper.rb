@@ -1,0 +1,2 @@
+module VatReportsHelper
+end

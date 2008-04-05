@@ -1,0 +1,2 @@
+class VatReportsController < ApplicationController
+end
