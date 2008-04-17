@@ -7,4 +7,12 @@ module ApplicationHelper
   def trimmed(amnt)
     amnt.to_s.gsub(/\.0*$/, "")
   end
+  
+  def month_select_tag(selected = nil)
+    select_tag("month", options_for_select(MONTHS, selected))
+  end
+  
+  def formatted(amount)
+    sprintf("%.2f", amount.to_i / 100.0)
+  end
 end

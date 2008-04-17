@@ -92,7 +92,8 @@ describe EventsController, " handling GET /events" do
   
   it "should find all events" do
     @events.should_receive(:find).with(:all, 
-                        :order => "event_date, receipt_number").and_return([@event])
+                        :order => "event_date, receipt_number",
+                        :include => {:event_lines => :account}).and_return([@event])
     do_get
   end
 end
@@ -114,7 +115,8 @@ describe EventsController, " handling GET /events with start_date" do
   it "should find all events" do
     @events.should_receive(:find).with(:all, 
                       :order => "event_date, receipt_number",
-                      :conditions => ["event_date >= ?", "2007-08-03"]).and_return([@event])
+                      :conditions => ["event_date >= ?", "2007-08-03"],
+                      :include => {:event_lines => :account}).and_return([@event])
     do_get
   end
 end
@@ -135,7 +137,8 @@ describe EventsController, " handling GET /events with end_date" do
   it "should find all events" do
     @events.should_receive(:find).with(:all, 
                       :order => "event_date, receipt_number",
-                      :conditions => ["event_date <= ?", "2007-08-03"]).and_return([@event])
+                      :conditions => ["event_date <= ?", "2007-08-03"],
+                      :include => {:event_lines => :account}).and_return([@event])
     do_get
   end
 end
@@ -156,7 +159,8 @@ describe EventsController, " handling GET /events with start_date and end_date" 
   it "should find all events" do
     @events.should_receive(:find).with(:all, 
                       :order => "event_date, receipt_number",
-                      :conditions => ["event_date >= ? and event_date <= ?", "2007-08-01", "2007-08-03"]).and_return([@event])
+                      :conditions => ["event_date >= ? and event_date <= ?", "2007-08-01", "2007-08-03"],
+                      :include => {:event_lines => :account}).and_return([@event])
     do_get
   end
 end

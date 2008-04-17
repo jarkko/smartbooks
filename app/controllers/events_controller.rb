@@ -7,7 +7,8 @@ class EventsController < ApplicationController
   # GET /events
   # GET /events.xml
   def index
-    options = {:order => "event_date, receipt_number"}
+    options = {:order => "event_date, receipt_number", 
+               :include => {:event_lines => :account}}
     if params[:start_date]
       start = Date.parse(params[:start_date])
       options[:conditions] = ["event_date >= ?", start.to_s(:db)]

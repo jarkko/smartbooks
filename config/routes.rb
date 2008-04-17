@@ -4,6 +4,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :fiscal_years do |fy|
     fy.resources :events
     fy.resources :accounts
+    fy.resources :vat_reports
+    fy.resource  :income_statement
   end  
   
   # The priority is based upon order of creation: first created -> highest priority.

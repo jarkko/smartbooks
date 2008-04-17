@@ -61,6 +61,12 @@ class Account < ActiveRecord::Base
                   :conditions => "event_date between '#{start_date.to_s(:db)}' and '#{end_date.to_s(:db)}'"}
     end
     
-    sprintf("%+.2f", (event_lines.sum(:amount, sql_opts) || 0) / 100.0)
+    sum = event_lines.sum(:amount, sql_opts) || 0
+    
+    opts[:formatted] ? sprintf("%+.2f", sum / 100.0) : sum
+  end
+  
+  def formatted_total(opts = {})
+    total(opts.merge(:formatted => true))
   end
 end

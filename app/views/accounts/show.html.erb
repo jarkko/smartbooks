@@ -17,5 +17,5 @@
 <% end %>
 
 <p id="total">
-  <%= colored_sum(@account.total) %>
+  <%= colored_sum(@account.total(:formatted => true)) %>
 </p>

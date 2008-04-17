@@ -60,3 +60,16 @@ end
 # Mime::Type.register "application/x-mobile", :mobile
 
 # Include your application configuration below
+MONTHS = [["Tammikuu", "1"],
+          ["Helmikuu", "2"],
+          ["Maaliskuu", "3"],
+          ["Huhtikuu", "4"],
+          ["Toukokuu", "5"],
+          ["Kesäkuu", "6"],
+          ["Heinäkuu", "7"],
+          ["Elokuu", "8"],
+          ["Syyskuu", "9"],
+          ["Lokakuu", "10"],
+          ["Marraskuu", "11"],
+          ["Joulukuu", "12"]
+        ]

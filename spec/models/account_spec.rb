@@ -57,34 +57,52 @@ describe Account do
                                 :start_date => Date.new(2007,1,1),
                                 :end_date => Date.new(2007,12,31))
       @account.fiscal_year = @fiscal_year
+      @lines.stub!(:sum).and_return(5600)
     end
     
     describe "without month set" do
-      before(:each) do
-        @lines.stub!(:sum).and_return(5600)
-      end
-
       it "should return the sum of all the lines" do
-        @account.total.should == "+56.00"
+        @account.total.should == 5600
+      end
+      
+      describe "when formatted parameter set" do
+        it "should return the sum formatted" do
+          @account.total(:formatted => true).should == "+56.00"
+        end
       end
     end
     
     describe "with month option set" do
       it "should restrict to events within the time frame" do
         @lines.should_receive(:sum).with(:amount,
-                    :joins => "join events on event_lines.event_id = events.id", 
-                    :conditions => "event_date between '2007-08-01' and '2007-08-31'")
-        @account.total(:month => "8")
+            :joins => "join events on event_lines.event_id = events.id", 
+            :conditions => "event_date between '2007-08-01' and '2007-08-31'").
+                and_return(-6000)
+        @account.total(:month => "8").should == -6000
       end
     end
     
     describe "with month option set to a range" do
       it "should restrict to events within the time frame" do
         @lines.should_receive(:sum).with(:amount,
-                    :joins => "join events on event_lines.event_id = events.id", 
-                    :conditions => "event_date between '2007-01-01' and '2007-10-31'")
+            :joins => "join events on event_lines.event_id = events.id", 
+            :conditions => "event_date between '2007-01-01' and '2007-10-31'")
         @account.total(:month => 1..10)
       end
+    end
+  end
+  
+  describe "formatted_total" do
+    it "should return the formatted total" do
+      @account.should_receive(:total).with(:formatted => true).and_return("+69.00")
+      @account.formatted_total.should == "+69.00"
+    end
+    
+    it "should pass options to total" do
+      @account.should_receive(:total).with(:month => 1..10,
+                                           :formatted => true).
+                                      and_return("+66.00")
+      @account.formatted_total(:month => 1..10).should == "+66.00"
     end
   end
 end
