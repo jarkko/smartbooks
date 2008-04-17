@@ -1,0 +1,106 @@
+<h1>Tuloslaskelma</h1>
+
+<h2>Tuotot</h2>
+
+<table>
+  <tr>
+    <th>Myyntituotot</th>
+    <td>
+      <%= formatted(@fiscal_year.sales.result.abs) %>
+    </td>
+  </tr>
+  
+  <% @fiscal_year.sales.children.each do |account| %>
+  <tr>
+    <td><%=h account.title %></td>
+    <td><%= formatted(account.result.abs) %></td>
+  </tr>
+  <% end %>
+  
+  <tr>
+    <th>
+      Korkotuotot
+    </th>
+    <td>
+      <%= formatted(@fiscal_year.interest_income.result.abs) %>
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Veronalaiset tuotot yhteensä</th>
+    <th>
+      <%= formatted(@fiscal_year.total_income.abs) %>
+    </th>
+  </tr>
+</table>
+
+<h2>Kulut</h2>
+
+<table>
+  <tr>
+    <td>Ostot ja varastojen muutokset</td>
+    <td><%= formatted(@fiscal_year.purchases.result.abs) %></td>
+  </tr>
+  
+  <tr>
+    <td>Ulkopuoliset palvelut</td>
+    <td><%= formatted(@fiscal_year.services.result.abs) %></td>
+  </tr>
+
+  <tr>
+    <td>Poistot</td>
+    <td><%= formatted(@fiscal_year.depreciation.result.abs) %></td>
+  </tr>
+  
+  <tr>
+    <td>Liiketoiminnan muut kulut</td>
+    <td><%= formatted(@fiscal_year.other_expenses.result.abs) %></td>
+  </tr>
+
+  <tr>
+    <td>Korkokulut</td>
+    <td><%= formatted(@fiscal_year.interest_expenses.result.abs) %></td>
+  </tr>
+  
+  <tr>
+    <th>
+      Vähennyskelpoiset kulut yhteensä
+    </th>
+    <th>
+      <%= formatted(@fiscal_year.total_expenses.abs) %>
+    </th>
+  </tr>
+  
+  <tr>
+    <th>Tilikauden voitto ennen veroja</th>
+    <th>
+      <%= formatted(@fiscal_year.net_income_before_taxes) %>
+    </th>
+  </tr>
+  
+  <tr>
+    <th>Liikevoitto</th>
+    <th>
+      <%= formatted(@fiscal_year.net_operating_income) %>
+    </th>
+  </tr>
+  
+</table>
+
+<h2>Vähennyskelvottomat kulut</h2>
+
+<table>
+  <tr>
+    <td>Välittömät verot</td>
+    <td>
+      <%= formatted(@fiscal_year.taxes.result) %>
+    </td>
+  </tr>
+  
+  <tr>
+    <th>Tilikauden voitto</th>
+    <th>
+      <%= formatted(@fiscal_year.net_income) %>
+    </th>
+  </tr>
+</table>

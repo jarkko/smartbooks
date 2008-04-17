@@ -1,0 +1,60 @@
+<h1>
+  Arvonlisäverolaskelma
+</h1>
+
+<p>
+  <% form_tag(new_fiscal_year_vat_report_path(@fiscal_year),
+              :method => :get) do %>
+    <%= month_select_tag(params[:month]) %>
+    <%= submit_tag "Valitse" %>
+  <% end %>
+</p>
+
+<% if params[:month] %>
+  
+  <table>
+    <tr>
+      <th>Vero myynnistä</th>
+    </tr>
+    
+    <tr>
+      <td>Arvonlisäverovelka 22%</td>
+      <td>
+        <%= @debt.formatted_total(:month => params[:month]) %>
+      </td>
+    </tr>
+    
+    <tr>
+      <th>Vähennettävät verot</th>
+    </tr>
+    
+    <tr>
+      <td>Arvonlisäverosaamiset</td>
+      <td>
+        <%= @receivables.formatted_total(:month => params[:month]) %>
+      </td>
+    </tr>
+    
+    <tr>
+      <td>Edellisten kausien vähentämättä jääneet verot</td>
+      <td>
+        <%= @receivables.formatted_total(:month => 1..(params[:month].to_i - 1)) %>
+      </td>
+    </tr>
+    
+    <tr>
+      <th>Maksettava vero</th>
+      <th>
+        <%= @fiscal_year.payable_vat_for(params[:month]) %>
+      </th>
+    </tr>
+    
+    <tr>
+      <th>Seuraaville kausille siirtyvät vähennykset</th>
+      <th>
+        <%= @fiscal_year.transferred_vat_receivables_for(params[:month]) %>
+      </th>
+    </tr>
+  </table>
+  
+<% end %>
