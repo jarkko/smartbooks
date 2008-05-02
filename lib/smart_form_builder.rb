@@ -106,7 +106,7 @@ class SmartFormBuilder < ActionView::Helpers::FormBuilder
   def label_text(field, options = {})
     title = options[:title] || field.to_s.humanize
     
-    "#{title.t} #{required_mark(field)}" 
+    "#{title} #{required_mark(field)}" 
   end
   
   def required_mark(field)
@@ -260,7 +260,7 @@ module ActionView
           value = value.to_s if selected.is_a?(String)          
           
           selected_attribute = ' selected="selected"' if option_value_selected?(value, selected)
-          options << %(<option value="#{html_escape(value.to_s)}"#{selected_attribute}>#{html_escape(text.to_s.t)}</option>)
+          options << %(<option value="#{html_escape(value.to_s)}"#{selected_attribute}>#{html_escape(text.to_s)}</option>)
         end
 
         options_for_select.join("\n")
