@@ -7,6 +7,8 @@ describe "/accounts/show.rhtml" do
     assigns[:fiscal_year] = @fiscal_year = mock_model(FiscalYear, :description => "2007")
     
     @account = mock_model(Account, :title => "Palvelut", :total => "+56.00")
+    @account.stub!(:total).with(:formatted => true, :only => :credit).and_return("-20.00")
+    @account.stub!(:total).with(:formatted => true, :only => :debit).and_return("+76.00")
     assigns[:account] = @account
     
     @event = mock_model(Event, :description => "Bankruptcy",
@@ -34,6 +36,14 @@ describe "/accounts/show.rhtml" do
         with_tag "td", line.sum
       end
     end
+  end
+  
+  it "should show total debit" do
+    response.should have_tag("#total_debit", "+76.00")
+  end
+  
+  it "should show total credit" do
+    response.should have_tag("#total_credit", "-20.00")
   end
   
   it "should show a total for the account" do

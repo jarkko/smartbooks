@@ -15,7 +15,13 @@ class FiscalYear < ActiveRecord::Base
   end
   
   def FiscalYear.account_names
-    {:vat_debt => "Arvonlisäverovelka 22%",
+    {:assets => "Vastaavaa",
+     :current_assets => "VAIHTUVAT VASTAAVAT",
+     :longterm_assets => "PYSYVÄT VASTAAVAT",
+     :vat_debt => "Arvonlisäverovelka 22%",
+     :vat_payable => "Tilitysvelat",
+     :accounts_payable => "Ostovelat",
+     :current_liabilities => "Lyhytaikainen vieras pääoma",
      :vat_receivables => "Arvonlisäverosaamiset",
      :sales => "Myyntituotot",
      :interest_income => "Muut korko- ja rahoitustuotot",
@@ -24,7 +30,18 @@ class FiscalYear < ActiveRecord::Base
      :depreciation => "Poistot",
      :other_expenses => "Liiketoiminnan muut kulut",
      :interest_expenses => "Korkokulut ja muut rahoituskulut",
-     :taxes => "Verot"}
+     :taxes => "Verot",
+     :bank_accounts => "Pankkisaamiset",
+     :short_term_receivables => "Lyhytaikaiset saamiset",
+     :accounts_receivable => "Myyntisaamiset",
+     :vat_returns => "Anotut arvonlisäveropalautukset",
+     :equipment => "Koneet ja kalusto",
+     :stockholders_equity => "Oma pääoma (tilinavaus)",
+     :private_equity => "Yksityistilit tilikaudella",
+     :cash_private_investments => "Yksityissijoitukset rahana",
+     :other_private_investments => "Muut yksityissijoitukset",
+     :cash_private_withdraws => "Yksityisnostot rahana",
+     :other_private_withdraws => "Muut yksityisnostot"}
   end
   
   self.account_names.each do |account, account_name|
@@ -55,6 +72,17 @@ class FiscalYear < ActiveRecord::Base
   
   def net_income
     net_income_before_taxes - taxes.result
+  end
+  
+  def private_equity_result
+    -1 * private_equity.result
+  end
+  
+  def liabilities_result
+    stockholders_equity.result.abs +
+    private_equity_result +
+    net_income +
+    current_liabilities.result.abs
   end
   
   private

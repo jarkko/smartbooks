@@ -1,2 +1,2 @@
-module BalanceSheetHelper
+module BalanceSheetsHelper
 end

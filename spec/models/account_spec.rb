@@ -65,6 +65,22 @@ describe Account do
         @account.total.should == 5600
       end
       
+      describe "and only option set to debit" do
+        it "should only fetch the sum from positive lines" do
+          @lines.should_receive(:sum).with(:amount,
+              :conditions => "amount > 0")
+          @account.total(:only => :debit)
+        end
+      end
+      
+      describe "and only option set to credit" do
+        it "should only fetch the sum from negative lines" do
+          @lines.should_receive(:sum).with(:amount,
+              :conditions => "amount < 0")
+          @account.total(:only => :credit)
+        end
+      end
+      
       describe "when formatted parameter set" do
         it "should return the sum formatted" do
           @account.total(:formatted => true).should == "+56.00"
@@ -88,6 +104,24 @@ describe Account do
             :joins => "join events on event_lines.event_id = events.id", 
             :conditions => "event_date between '2007-01-01' and '2007-10-31'")
         @account.total(:month => 1..10)
+      end
+      
+      describe "and only option set to debit" do
+        it "should only fetch the sum from positive lines" do
+          @lines.should_receive(:sum).with(:amount,
+              :joins => "join events on event_lines.event_id = events.id", 
+              :conditions => "event_date between '2007-01-01' and '2007-10-31' and amount > 0")
+          @account.total(:month => 1..10, :only => :debit)
+        end
+      end
+      
+      describe "and only option set to credit" do
+        it "should only fetch the sum from negative lines" do
+          @lines.should_receive(:sum).with(:amount,
+              :joins => "join events on event_lines.event_id = events.id", 
+              :conditions => "event_date between '2007-01-01' and '2007-10-31' and amount < 0")
+          @account.total(:month => 1..10, :only => :credit)
+        end
       end
     end
   end

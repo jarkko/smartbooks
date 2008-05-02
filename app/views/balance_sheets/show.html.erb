@@ -1,0 +1,142 @@
+<h1>Tase</h1>
+
+<div id="assets">
+  <h2>
+    Vastaavaa
+  </h2>
+  
+  <h3>
+    Vaihtuvat vastaavat
+  </h3>
+  
+  <table>
+    <tr>
+      <th>Pankkisaamiset</th>
+      <th><%= formatted(@fiscal_year.bank_accounts.result.abs) %></th>
+    </tr>
+    
+    <% @fiscal_year.bank_accounts.children.each do |account| %>
+    <tr>
+      <td>
+        <%= account.title %>
+      </td>
+      <td>
+        <%= formatted(account.result) %>
+      </td>
+    </tr>
+    <% end %>
+    
+    <tr>
+      <th>Lyhytaikaiset saamiset</th>
+      <th><%= formatted(@fiscal_year.short_term_receivables.result.abs) %></th>
+    </tr>
+    
+    <tr>
+      <td>Myyntisaamiset</td>
+      <td><%= formatted(@fiscal_year.accounts_receivable.result.abs) %></td>
+    </tr>
+
+    <tr>
+      <td>Arvonlisäverosaamiset</td>
+      <td><%= formatted(@fiscal_year.vat_receivables.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <td>Anotut arvonlisäveropalautukset</td>
+      <td><%= formatted(@fiscal_year.vat_returns.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <th>Vaihtuvat vastaavat yhteensä</th>
+      <th><%= formatted(@fiscal_year.current_assets.result.abs) %></th>
+    </tr>
+    
+  </table>
+  
+  <h3>
+    Pysyvät vastaavat
+  </h3>
+  
+  <table>
+    <tr>
+      <td>Koneet ja kalusto</td>
+      <td><%= formatted(@fiscal_year.equipment.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <th>Pysyvät vastaavat yhteensä</th>
+      <th><%= formatted(@fiscal_year.longterm_assets.result.abs) %></th>
+    </tr>
+    
+    <tr>
+      <th>Vastaavat yhteensä</th>
+      <th><%= formatted(@fiscal_year.assets.result.abs) %></th>
+    </tr>
+  </table>
+</div>
+
+<div id="liabilities">
+  <h2>Vastattavaa</h2>
+  
+  <table>
+    <tr>
+      <td>Oma pääoma (tilinavaus)</td>
+      <td><%= formatted(@fiscal_year.stockholders_equity.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <th>Yksityissijoitukset/-nostot</th>
+      <th><%= formatted(@fiscal_year.private_equity_result) %></th>
+    </tr>
+    
+    <tr>
+      <td>Yksityissijoitukset rahana</td>
+      <td><%= formatted(@fiscal_year.cash_private_investments.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <td>Muut yksityissijoitukset</td>
+      <td><%= formatted(@fiscal_year.other_private_investments.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <td>Yksityisnostot rahana</td>
+      <td><%= formatted(@fiscal_year.cash_private_withdraws.result.abs * -1) %></td>
+    </tr>
+    
+    <tr>
+      <td>Muut yksityisnostot</td>
+      <td><%= formatted(@fiscal_year.other_private_withdraws.result.abs * -1) %></td>
+    </tr>
+    
+    <tr>
+      <th>Tilikauden <%= (@fiscal_year.net_income < 0) ? "tappio" : "voitto" %></th>
+      <th><%= formatted(@fiscal_year.net_income) %></th>
+    </tr>
+    
+    <tr>
+      <th>Lyhytaikaiset velat</th>
+      <th><%= formatted(@fiscal_year.current_liabilities.result.abs) %></th>
+    </tr>
+    
+    <tr>
+      <td>Arvonlisäverovelka 22%</td>
+      <td><%= formatted(@fiscal_year.vat_debt.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <td>Tilitysvelat</td>
+      <td><%= formatted(@fiscal_year.vat_payable.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <td>Ostovelat</td>
+      <td><%= formatted(@fiscal_year.accounts_payable.result.abs) %></td>
+    </tr>
+    
+    <tr>
+      <th>Vastattavat yhteensä</th>
+      <th><%= formatted(@fiscal_year.liabilities_result) %></th>
+    </tr>
+  </table>
+</div>

@@ -93,7 +93,7 @@
   <tr>
     <td>Välittömät verot</td>
     <td>
-      <%= formatted(@fiscal_year.taxes.result) %>
+      <%= formatted(@fiscal_year.taxes.result.abs) %>
     </td>
   </tr>
   

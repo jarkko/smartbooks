@@ -14,7 +14,26 @@ class AccountsController < ApplicationController
   # GET /accounts/1.xml
   def show
     @fiscal_year = FiscalYear.find(params[:fiscal_year_id])
-    @account = @fiscal_year.accounts.find(params[:id], :include => [:event_lines => :event])
+    
+    options = {:include => [:event_lines => :event]}
+    
+    if params[:start_date]
+      start = Date.parse(params[:start_date])
+      options[:conditions] = ["event_date >= ?", start.to_s(:db)]
+    end
+        
+    if params[:end_date]
+      end_date = Date.parse(params[:end_date])
+      if options[:conditions]
+        options[:conditions][0] << " and "
+      else
+        options[:conditions] = [""]
+      end
+      options[:conditions][0] << "event_date <= ?"
+      options[:conditions] << end_date.to_s(:db)
+    end
+    
+    @account = @fiscal_year.accounts.find(params[:id], options)
   end
 
   # GET /accounts/new

@@ -16,6 +16,12 @@
 </table>
 <% end %>
 
+<p id="total_debit">
+  <%= @account.total(:formatted => true, :only => :debit) %>
+</p>
+<p id="total_credit">
+  <%= @account.total(:formatted => true, :only => :credit) %>
+</p>
 <p id="total">
   <%= colored_sum(@account.total(:formatted => true)) %>
 </p>

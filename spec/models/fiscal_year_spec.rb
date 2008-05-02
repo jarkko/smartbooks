@@ -119,4 +119,44 @@ describe FiscalYear do
       end
     end
   end
+  
+  describe "private_equity" do    
+    describe "when investments > withdraws" do
+      before(:each) do
+        @private_equity.stub!(:result).and_return(-63000)
+      end
+      
+      it "should return positive balance" do
+        @fiscal_year.private_equity_result.should == 63000
+      end
+    end
+    
+    describe "when investments < withdraws" do
+      before(:each) do
+        @private_equity.stub!(:result).and_return(63000)
+      end
+      
+      it "should return positive balance" do
+        @fiscal_year.private_equity_result.should == -63000
+      end
+    end
+  end
+  
+  describe "liabilities" do
+    before(:each) do
+      @stockholders_equity.stub!(:result).and_return(-900000)
+      @private_equity.stub!(:result).and_return(-3700000)
+      @fiscal_year.stub!(:net_income).and_return(2490000)
+      @current_liabilities.stub!(:result).and_return(-480000)
+    end
+    
+    it "should return stockholder's equity + private equity + net income/loss +
+        short term liabilities" do
+      @fiscal_year.liabilities_result.should == 
+          (@fiscal_year.stockholders_equity.result.abs +
+           @fiscal_year.private_equity_result +
+           @fiscal_year.net_income +
+           @fiscal_year.current_liabilities.result.abs)
+    end
+  end
 end

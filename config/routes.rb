@@ -6,6 +6,7 @@ ActionController::Routing::Routes.draw do |map|
     fy.resources :accounts
     fy.resources :vat_reports
     fy.resource  :income_statement
+    fy.resource  :balance_sheet
   end  
   
   # The priority is based upon order of creation: first created -> highest priority.

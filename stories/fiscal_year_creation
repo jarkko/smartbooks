@@ -1,0 +1,17 @@
+Story: Creating a new fiscal year
+
+  As a user
+  I want to be able to create new fiscal years
+  So that I can continue keeping my books on the system from year to year
+  
+  Scenario: User successfully creates a new fiscal year without copying an existing year
+    Given an empty database
+    When user loads the new fiscal year form
+    And fills in Description with 2008
+    And fills in Start date with 2008-01-01
+    And fills in End date with 2008-12-31
+    And clicks Create fiscal year
+    Then a new fiscal year should be created
+    And the new fiscal year should have 2008 as its description
+    And the new fiscal year should span from 2008-01-01 to 2008-12-31
+    And the new fiscal year should have no accounts 

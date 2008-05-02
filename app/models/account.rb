@@ -61,6 +61,16 @@ class Account < ActiveRecord::Base
                   :conditions => "event_date between '#{start_date.to_s(:db)}' and '#{end_date.to_s(:db)}'"}
     end
     
+    if opts[:only]
+      operator = opts[:only] == :credit ? "<" : ">"
+      condition = "amount #{operator} 0"
+      if sql_opts[:conditions]
+        sql_opts[:conditions] << " and #{condition}"
+      else
+        sql_opts[:conditions] = condition
+      end
+    end
+    
     sum = event_lines.sum(:amount, sql_opts) || 0
     
     opts[:formatted] ? sprintf("%+.2f", sum / 100.0) : sum
