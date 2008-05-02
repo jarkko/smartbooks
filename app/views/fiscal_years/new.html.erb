@@ -2,7 +2,11 @@
 
 <%= error_messages_for :fiscal_year %>
 
-<% form_for(:fiscal_year, :url => fiscal_years_path) do |f| %>
+<% form_for(:fiscal_year, @fiscal_year, :url => fiscal_years_path,
+            :builder => SmartFormBuilder) do |f| %>
+  <%= f.text_field "description" %>
+
+
   <p>
     <%= submit_tag "Create" %>
   </p>
