@@ -7,11 +7,19 @@ Story: Creating a new fiscal year
   Scenario: User successfully creates a new fiscal year without copying an existing year
     Given an empty database
     When user loads the new fiscal year form
-    And fills in Description with 2008
-    And fills in Start date with 2008-01-01
-    And fills in End date with 2008-12-31
-    And clicks Create fiscal year
+    And fills in fiscal year details
+    And clicks 'Create fiscal year'
     Then a new fiscal year should be created
-    And the new fiscal year should have 2008 as its description
-    And the new fiscal year should span from 2008-01-01 to 2008-12-31
+    And the user should be shown a message that the fiscal year was created
     And the new fiscal year should have no accounts 
+
+  Scenario: User successfully creates a new fiscal year copying an existing year
+    Given an empty database
+    And a fiscal year with existing accounts
+    When user loads the new fiscal year form
+    And fills in fiscal year details
+    And selects to copy accounts from the existing fiscal year
+    And clicks 'Create fiscal year'
+    Then a new fiscal year should be created
+    And the user should be shown a message that the fiscal year was created
+    And the new fiscal year should have similar accounts as the existing year

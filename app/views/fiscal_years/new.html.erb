@@ -6,9 +6,13 @@
             :builder => SmartFormBuilder) do |f| %>
   <%= f.text_field "description" %>
 
+  <%= f.text_field 'start_date', :class => "date" %>
+  <%= f.text_field 'end_date', :class => "date" %>
+  
+  <%= f.select 'copy_accounts_from', @fiscal_years.map{|fy| [fy.description, fy.id]} %>
 
   <p>
-    <%= submit_tag "Create" %>
+    <%= submit_tag "Create fiscal year" %>
   </p>
 <% end %>
 

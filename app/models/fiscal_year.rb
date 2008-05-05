@@ -1,4 +1,6 @@
 class FiscalYear < ActiveRecord::Base
+  attr_accessor :copy_accounts_from
+  
   has_many :accounts
   has_many :events
   

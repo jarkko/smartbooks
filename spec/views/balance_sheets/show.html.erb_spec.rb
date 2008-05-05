@@ -5,7 +5,7 @@ describe "/balance_sheets/show" do
   include ApplicationHelper
   
   before(:each) do
-    assigns[:fiscal_year] = mock_fiscal_year                                                  
+    assigns[:fiscal_year] = @fiscal_year = mock_fiscal_year                                                  
   end
   
   describe "when net income positive" do
