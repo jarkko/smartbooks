@@ -20,8 +20,40 @@ describe FiscalYear do
   
   FiscalYear.account_names.each do |key, name|
     describe "#{key}" do
-      it "should return account '#{name}'" do
+      it "calling #{key} should return account '#{name}'" do
         @fiscal_year.send(key).should == instance_variable_get("@#{key}")
+      end
+    end
+  end
+  
+  describe "creation" do
+    before(:each) do
+      @fiscal_year.connection.stub!(:insert).and_return(96)
+      
+      @fy2 = mock_fiscal_year
+      FiscalYear.stub!(:find).with("69").and_return(@fy2)
+    end
+    
+    describe "when copy_accounts_from set" do
+      before(:each) do
+        @fiscal_year.copy_accounts_from = "69"
+      end
+      
+      it "should set the accounts to equal the ones of the source" do
+        @fiscal_year.save
+        @fiscal_year.accounts.map(&:title).should ==
+          @fy2.accounts.map(&:title)
+      end
+    end
+    
+    describe "when copy_accounts_from blank" do
+      before(:each) do
+        @fiscal_year.copy_accounts_from = ""
+      end
+      
+      it "should not copy accounts" do
+        @fiscal_year.should_not_receive(:copy_accounts)
+        @fiscal_year.save
       end
     end
   end

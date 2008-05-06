@@ -4,6 +4,8 @@ class FiscalYear < ActiveRecord::Base
   has_many :accounts
   has_many :events
   
+  before_create :copy_accounts_if_needed
+  
   def payable_vat_for(month)
     sum = vat_balance_for(month)
     sum = sum < 0.00 ? sum.abs : 0
@@ -92,5 +94,18 @@ class FiscalYear < ActiveRecord::Base
   def vat_balance_for(month)
     month = month.to_i
     vat_debt.total(:month => month) + vat_receivables.total(:month => 1..month)
+  end
+  
+  def copy_accounts_if_needed
+    return true if copy_accounts_from.blank?
+    copy_accounts(copy_accounts_from)
+  end
+  
+  def copy_accounts(source_year)
+    source = FiscalYear.find(source_year)
+    source.accounts.each do |account|
+      new_account = Account.new(account.attributes.except("id").except("fiscal_year_id"))
+      accounts << new_account
+    end
   end
 end

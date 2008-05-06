@@ -16,13 +16,18 @@ module FiscalYearSpecHelper
                              :end_date => Date.new(2008,12,31),
                              :to_param => "69",
                              :copy_accounts_from => nil)
+                             
+    fiscal_year.stub!(:accounts).and_return([])
     
     FiscalYear.account_names.each do |key, name|
-      instance_variable_set("@#{key}", 
-                            mock_model(Account,
-                                       :title => name,
-                                       :result => (((-1) ** rand(2)) *
-                                                   rand(100000))))
+      account = stub_model(Account,
+                           :result => (((-1) ** rand(2)) *
+                                        rand(100000))) do |acc|
+        acc.title = name
+      end
+      
+      instance_variable_set("@#{key}", account)
+      fiscal_year.accounts << account
       fiscal_year.stub!(key).and_return(instance_variable_get("@#{key}"))
     end
 
