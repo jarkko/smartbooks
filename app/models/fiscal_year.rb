@@ -1,5 +1,5 @@
 class FiscalYear < ActiveRecord::Base
-  attr_accessor :copy_accounts_from
+  attr_accessor :copy_accounts_from, :copy_balance
   
   has_many :accounts
   has_many :events
@@ -89,6 +89,18 @@ class FiscalYear < ActiveRecord::Base
     current_liabilities.result.abs
   end
   
+  def create_event(event_hsh, lines_hsh)
+    event = events.build(event_hsh)
+    
+    lines_hsh.each_value do |line|
+      next if %w(credit debit).all? { |i| line[i].blank? }
+      event.event_lines.build(line)
+    end
+    
+    event.save
+    return event    
+  end
+  
   private
   
   def vat_balance_for(month)
@@ -103,9 +115,20 @@ class FiscalYear < ActiveRecord::Base
   
   def copy_accounts(source_year)
     source = FiscalYear.find(source_year)
-    source.accounts.each do |account|
-      new_account = Account.new(account.attributes.except("id").except("fiscal_year_id"))
-      accounts << new_account
+    source.accounts.find_all_by_parent_id(nil).each do |source_account|
+      copy_account(source_account)
     end
+  end
+  
+  def copy_account(source_account)
+    account = accounts.build(source_account.attributes.except("id").
+                            except("fiscal_year_id").
+                            except("parent_id"))
+        
+    source_account.children.each do |child|
+      account.children << copy_account(child)
+    end
+    
+    account
   end
 end

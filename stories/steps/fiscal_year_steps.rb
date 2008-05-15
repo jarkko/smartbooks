@@ -13,11 +13,36 @@ steps_for(:fiscal_year) do
                                 :end_date => "2007-12-31")
                                 
     @fiscal_year_count += 1
+    
+    @assets = @existing_fiscal_year.accounts.create(
+                                          :title => "Vastaavaa",
+                                          :account_number => "999")
+                                              
+    @liabilities = @existing_fiscal_year.accounts.create(
+                                          :title => "Vastattavaa",
+                                          :account_number => "998")
                                 
     5.times do |i|
-      @existing_fiscal_year.accounts << Account.create!(
-                                          :title => "account_#{i}",
-                                          :account_number => "#{i}")      
+      account = Account.create!(
+                    :title => "account_#{i}",
+                    :account_number => "#{i}",
+                    :parent_id => (rand(10) % 2 ? @assets.id : @liabilities.id))
+      @existing_fiscal_year.accounts << account
+    end
+    
+    10.times do |i|
+      event = @existing_fiscal_year.events.build(
+                        :event_date => Date.today,
+                        :description => "Event #{i}",
+                        :receipt_number => "000#{i}")
+      amount = rand(10000)
+      event.event_lines.build(
+          {:amount => amount, 
+           :account => @existing_fiscal_year.accounts.rand})
+      event.event_lines.build(
+          {:amount => (-1 * amount), 
+           :account => @existing_fiscal_year.accounts.rand})
+      event.save!
     end
   end
   
@@ -39,6 +64,10 @@ steps_for(:fiscal_year) do
     selects "2007"
   end
   
+  When "chooses to copy the balance of the balance sheet accounts" do
+    checks "Copy the balance sheet balance"
+  end
+  
   Then "a new fiscal year should be created" do
     FiscalYear.count.should == @fiscal_year_count + 1
     @fiscal_year = FiscalYear.find(:first, :order => "id desc")
@@ -56,7 +85,23 @@ steps_for(:fiscal_year) do
   end
   
   Then "the new fiscal year should have similar accounts as the existing year" do
-    @fiscal_year.accounts.count.should == @existing_fiscal_year.accounts.count
-    @fiscal_year.accounts.map(&:title).should == @existing_fiscal_year.accounts.map(&:title)
+    @fiscal_year.accounts.count.should ==
+      @existing_fiscal_year.accounts.count
+    @fiscal_year.accounts.map(&:title).sort.should ==
+      @existing_fiscal_year.accounts.map(&:title).sort
+    
+    @fiscal_year.assets.children.should_not be_empty  
+    @fiscal_year.assets.children.map(&:title).should ==
+      @existing_fiscal_year.assets.children.map(&:title)
+  end
+  
+  Then "the balance sheet accounts should have equal balance with the corresponding accounts in the previous year" do    
+    [:assets, :liabilities].each do |balance_sheet_account|
+      @fiscal_year.send(balance_sheet_account).children.each do |account|
+        account.total.should == 
+         @existing_fiscal_year.accounts.
+            find_by_account_number(account.account_number).total
+      end
+    end 
   end
 end

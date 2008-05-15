@@ -15,7 +15,8 @@ module FiscalYearSpecHelper
                              :start_date => Date.new(2008,1,1),
                              :end_date => Date.new(2008,12,31),
                              :to_param => "69",
-                             :copy_accounts_from => nil)
+                             :copy_accounts_from => nil,
+                             :copy_balance => nil)
                              
     fiscal_year.stub!(:accounts).and_return([])
     
@@ -31,13 +32,29 @@ module FiscalYearSpecHelper
       fiscal_year.stub!(key).and_return(instance_variable_get("@#{key}"))
     end
 
-    @subaccounts = [mock_model(Account, :title => "Myynti 22%", :result => -54000),
-      mock_model(Account, :title => "Myynti 0%", :result => -15000)]  
+    @subaccounts = [
+      stub_model(Account, :result => -54000) do |acc|
+        acc.title = "Myynti 22%"
+      end,
+      stub_model(Account, :result => -15000) do |acc|
+        acc.title = "Myynti 0%"
+      end
+    ]  
     @sales.stub!(:children).and_return(@subaccounts)
+    fiscal_year.accounts.concat(@subaccounts)
     
     @bank_accounts.stub!(:children).and_return(
-      [mock_model(Account, :title => "Sampo", :result => 30000),
-       mock_model(Account, :title => "Nordea", :result => 15000)])
+      [
+        stub_model(Account, :result => 30000) do |acc|
+          acc.title = "Sampo"
+          acc.parent_id = @bank_accounts.id
+        end,
+        stub_model(Account, :result => 15000) do |acc|
+          acc.title = "Nordea"
+          acc.parent_id = @bank_accounts.id
+        end
+      ])
+    fiscal_year.accounts.concat(@bank_accounts.children)
     
     
     @total_income = @sales.result + @interest_income.result
@@ -94,4 +111,35 @@ Spec::Runner.configure do |config|
   # config.mock_with :mocha
   # config.mock_with :flexmock
   # config.mock_with :rr
+end
+
+module EventsControllerSpecHelper
+  def valid_attributes
+    {:fiscal_year_id => 1, 
+     :line => event_lines,
+     :event => {:receipt_number => "", :description => "yrittäjäeläkemaksu",
+                "event_date(1i)" => "2007", "event_date(2i)" => "8", 
+                "event_date(3i)" => "27"}}
+  end
+  
+  def do_post
+    post :create, valid_attributes.except(:fiscal_year_id)
+  end
+
+  def event_lines
+    {"1" => {"debit" => "", "account_id" => "380", "credit" => "60"}, 
+    "2" => {"debit" => "50", "account_id" => "398", "credit" => ""}, 
+    "3" => {"debit" => "10", "account_id" => "359", "credit" => ""}, 
+    "4" => {"debit" => "", "account_id" => "357", "credit" => ""}}
+  end
+  
+  def prepare_events
+    @event = mock_model(Event)
+    Event.stub!(:find).and_return([@event])
+    @fy = mock_model(FiscalYear)
+    FiscalYear.stub!(:find).and_return(@fy)
+    @events = [@event]
+    @events.stub!(:find).and_return(@events)
+    @fy.stub!(:events).and_return(@events)
+  end
 end

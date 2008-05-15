@@ -10,6 +10,8 @@
   <%= f.text_field 'end_date', :class => "date" %>
   
   <%= f.select 'copy_accounts_from', @fiscal_years.map{|fy| [fy.description, fy.id]} %>
+  
+  <%= f.check_box 'copy_balance', :title => "Copy the balance sheet balance" %>
 
   <p>
     <%= submit_tag "Create fiscal year" %>

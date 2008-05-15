@@ -31,6 +31,10 @@ describe FiscalYear do
       @fiscal_year.connection.stub!(:insert).and_return(96)
       
       @fy2 = mock_fiscal_year
+      @root_accounts = @fy2.accounts - @bank_accounts.children -
+                       @sales.children
+      @fy2.accounts.stub!(:find_all_by_parent_id).
+            and_return(@root_accounts)
       FiscalYear.stub!(:find).with("69").and_return(@fy2)
     end
     
@@ -40,9 +44,31 @@ describe FiscalYear do
       end
       
       it "should set the accounts to equal the ones of the source" do
+        #puts "\nFY\n" + @fiscal_year.accounts.map{|a| [a.id, a.title]}.inspect
+        #puts "\nFY2\n" + @fy2.accounts.map{|a| [a.id, a.title]}.inspect
         @fiscal_year.save
-        @fiscal_year.accounts.map(&:title).should ==
-          @fy2.accounts.map(&:title)
+        #puts @fiscal_year.accounts.map{|a| [a.id, a.title]}.inspect
+        @fiscal_year.accounts.map(&:title).sort.should ==
+          @fy2.accounts.map(&:title).sort
+      end
+      
+      it "should rebuild the account hierarchy" do
+        @fiscal_year.save
+        @fiscal_year.accounts.
+          detect do |account| 
+            account.title == "Pankkisaamiset"
+          end.children.map(&:title).should ==
+              @fy2.bank_accounts.children.map(&:title)
+      end
+      
+      describe "and copy_balance set" do
+        before(:each) do
+          @fiscal_year.copy_balance = "1"
+        end
+        
+        it "should open the balance sheet accounts with the balance from the previous year" do
+          
+        end
       end
     end
     
@@ -189,6 +215,44 @@ describe FiscalYear do
            @fiscal_year.private_equity_result +
            @fiscal_year.net_income +
            @fiscal_year.current_liabilities.result.abs)
+    end
+  end
+  
+  describe "create_event" do
+    before(:each) do
+      @event = mock_model(Event, :event_lines => [],
+                                 :save => true)
+      
+      @event.event_lines.stub!(:build)
+      @lines = {
+        "1" => {"debit" => "", "account_id" => "380", "credit" => "60"}, 
+        "2" => {"debit" => "50", "account_id" => "398", "credit" => ""},
+        "3" => {"debit" => "10", "account_id" => "359", "credit" => ""},
+        "4" => {"debit" => "", "account_id" => "357", "credit" => ""}}
+        
+      @fiscal_year.events.stub!(:build).and_return(@event)
+    end
+    
+    it "should create new Event" do
+      @fiscal_year.events.should_receive(:build).
+          with(@event).and_return(@event)
+      @fiscal_year.create_event(@event, @lines)
+    end
+    
+    it "should add event lines to the event" do
+      (@lines.keys - ["4"]).each do |line|
+        @event.event_lines.should_receive(:build).with(@lines[line])      
+      end
+      @fiscal_year.create_event(@event, @lines)
+    end
+    
+    it "should not add line where both debit and credit are empty" do
+      @event.event_lines.should_not_receive(:build).with(@lines["4"])
+      @fiscal_year.create_event(@event, @lines)
+    end
+    
+    it "should return the event" do
+      @fiscal_year.create_event(@event, @lines).should == @event
     end
   end
 end

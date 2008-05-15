@@ -1,36 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-module EventsControllerSpecHelper
-  def valid_attributes
-    {:fiscal_year_id => 1, 
-     :line => event_lines,
-     :event => {:receipt_number => "", :description => "yrittäjäeläkemaksu",
-                "event_date(1i)" => "2007", "event_date(2i)" => "8", 
-                "event_date(3i)" => "27"}}
-  end
-  
-  def do_post
-    post :create, valid_attributes.except(:fiscal_year_id)
-  end
-
-  def event_lines
-    {"1" => {"debit" => "", "account_id" => "380", "credit" => "60"}, 
-    "2" => {"debit" => "50", "account_id" => "398", "credit" => ""}, 
-    "3" => {"debit" => "10", "account_id" => "359", "credit" => ""}, 
-    "4" => {"debit" => "", "account_id" => "357", "credit" => ""}}
-  end
-  
-  def prepare_events
-    @event = mock_model(Event)
-    Event.stub!(:find).and_return([@event])
-    @fy = mock_model(FiscalYear)
-    FiscalYear.stub!(:find).and_return(@fy)
-    @events = [@event]
-    @events.stub!(:find).and_return(@events)
-    @fy.stub!(:events).and_return(@events)
-  end
-end
-
 describe EventsController, "#route_for" do
 
   it "should map { :controller => 'events', :action => 'index' } to /events" do
@@ -368,31 +337,15 @@ describe EventsController, " handling POST /events" do
     FiscalYear.stub!(:find).and_return(@fy)
     @event = Event.new
     @event.stub!(:to_param).and_return("69")
-    @event.stub!(:save).and_return(true)
-    @events = [@event]
-    @events.stub!(:build).and_return(@event)
-    @fy.stub!(:events).and_return(@events)
-  end
-
-  it "should create new Event" do
-    @events.should_receive(:build).
-        with(valid_attributes[:event].stringify_keys).
-        and_return(@event)
-    do_post
+    @event.stub!(:save!).and_return(true)
+    @fy.stub!(:create_event).and_return(@event)
   end
   
-  it "should save the event" do
-    @event.should_receive(:save).and_return(true)
-    do_post
-  end
-  
-  it "should build event_lines for all non-empty lines" do
-    @event.event_lines.should_receive(:build).exactly(3).times
-    do_post
-  end
-  
-  it "should not build event_lines when both debit and credit are empty" do
-    @event.event_lines.should_not_receive(:build).with(event_lines["4"])
+  it "should create event" do
+    @fy.should_receive(:create_event).
+                    with(valid_attributes[:event].stringify_keys,
+                         valid_attributes[:line]).
+                    and_return(@event)
     do_post
   end
   
@@ -408,11 +361,12 @@ describe EventsController, " handling POST /events" do
 
   describe "when saving fails" do
     before(:each) do
-      @event.should_receive(:save).and_return(false)
+      @event.stub!(:save!).
+          and_raise(ActiveRecord::RecordInvalid.new(@event))
       @a1 = mock_model(Account, :title => "foo", :id => 1)
       @a2 = mock_model(Account, :title => "bar", :id => 2)
       @accounts = [@a1, @a2]
-      Account.stub!(:find_for_dropdown).and_return(@accounts)
+      Account.stub!(:find_for_dropdown).and_return(@accounts)      
     end
     
     it "should show the form again" do

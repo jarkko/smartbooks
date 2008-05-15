@@ -22,6 +22,7 @@ describe "/fiscal_years/new.html.erb" do
           with_tag "option[value=#{fy.id}]", fy.description
         end
       end
+      with_tag "input[type=checkbox][name='fiscal_year[copy_balance]']"
       with_tag "input[type=submit][value='Create fiscal year']"
     end
   end

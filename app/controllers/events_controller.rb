@@ -66,30 +66,19 @@ class EventsController < ApplicationController
     #end
     #session[:forms].delete(params[:form_token])
     
-    Event.transaction do
-      @event = @fiscal_year.events.build(params[:event])
+    @event = @fiscal_year.create_event(params[:event], params[:line])
+    @event.save!
+    flash[:notice] = 'Event was successfully created.'
+    redirect_to fiscal_year_events_url(:fiscal_year_id => @fiscal_year,
+                            :anchor => "event_#{@event.to_param}")
 
-      params[:line].each_value do |line|
-        next if %w(credit debit).all? { |i| line[i].blank? }
-        @event.event_lines.build(line)
-      end
+  rescue ActiveRecord::RecordInvalid
+    flash[:warning] = 'Saving event failed.'
+    @lines = @event.event_lines
+    2.times { @lines << EventLine.new }
+    @accounts = Account.find_for_dropdown
 
-      respond_to do |format|
-        if @event.save
-          flash[:notice] = 'Event was successfully created.'
-          format.html { redirect_to fiscal_year_events_url(:fiscal_year_id => @fiscal_year, :anchor => "event_#{@event.to_param}") }
-          format.xml  { head :created, :location => event_url(@fiscal_year, @event) }
-        else
-          flash[:warning] = 'Saving event failed.'
-          @lines = @event.event_lines
-          2.times { @lines << EventLine.new }
-          @accounts = Account.find_for_dropdown
-          
-          format.html { render :action => "new" }
-          format.xml  { render :xml => @event.errors.to_xml }
-        end
-      end
-    end
+    render :action => "new"
   end
 
   # PUT /events/1

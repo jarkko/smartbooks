@@ -176,9 +176,11 @@ require File.dirname(__FILE__) + '/../spec_helper'
 #  end
 #end
 
-describe EventLine, "saving test" do
-  it "should work" do
-    e = EventLine.new
-    e.save
+describe EventLine do
+  describe "saving" do
+    it "should work" do
+      e = EventLine.new
+      e.save
+    end
   end
 end
