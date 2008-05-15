@@ -218,41 +218,59 @@ describe FiscalYear do
     end
   end
   
-  describe "create_event" do
+  describe "event creation" do
     before(:each) do
       @event = mock_model(Event, :event_lines => [],
                                  :save => true)
-      
+
       @event.event_lines.stub!(:build)
       @lines = {
         "1" => {"debit" => "", "account_id" => "380", "credit" => "60"}, 
         "2" => {"debit" => "50", "account_id" => "398", "credit" => ""},
         "3" => {"debit" => "10", "account_id" => "359", "credit" => ""},
         "4" => {"debit" => "", "account_id" => "357", "credit" => ""}}
-        
+
       @fiscal_year.events.stub!(:build).and_return(@event)
     end
     
-    it "should create new Event" do
-      @fiscal_year.events.should_receive(:build).
-          with(@event).and_return(@event)
-      @fiscal_year.create_event(@event, @lines)
-    end
-    
-    it "should add event lines to the event" do
-      (@lines.keys - ["4"]).each do |line|
-        @event.event_lines.should_receive(:build).with(@lines[line])      
+    describe "create_event" do
+      before(:each) do
+        @fiscal_year.stub!(:build_event).and_return(@event)
       end
-      @fiscal_year.create_event(@event, @lines)
+      
+      it "should delegate to build_event" do
+        @fiscal_year.should_receive(:build_event).with(@event, @lines).
+          and_return(@event)
+        @fiscal_year.create_event(@event, @lines)
+      end
+      
+      it "should return the event" do
+        @fiscal_year.create_event(@event, @lines).should == @event
+      end
     end
     
-    it "should not add line where both debit and credit are empty" do
-      @event.event_lines.should_not_receive(:build).with(@lines["4"])
-      @fiscal_year.create_event(@event, @lines)
-    end
-    
-    it "should return the event" do
-      @fiscal_year.create_event(@event, @lines).should == @event
+    describe "build_event" do
+      it "should build new Event" do
+        @fiscal_year.events.should_receive(:build).
+            with(@event).and_return(@event)
+        @fiscal_year.build_event(@event, @lines)
+      end
+
+      it "should add event lines to the event" do
+        (@lines.keys - ["4"]).each do |line|
+          @event.event_lines.should_receive(:build).with(@lines[line])      
+        end
+        @fiscal_year.build_event(@event, @lines)
+      end
+
+      it "should not add line where both debit and credit are empty" do
+        @event.event_lines.should_not_receive(:build).with(@lines["4"])
+        @fiscal_year.build_event(@event, @lines)
+      end
+
+      it "should return the event" do
+        @fiscal_year.build_event(@event, @lines).should == @event
+      end
     end
   end
 end

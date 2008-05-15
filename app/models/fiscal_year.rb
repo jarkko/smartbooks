@@ -90,6 +90,13 @@ class FiscalYear < ActiveRecord::Base
   end
   
   def create_event(event_hsh, lines_hsh)
+    event = build_event(event_hsh, lines_hsh)
+    
+    event.save
+    return event    
+  end
+  
+  def build_event(event_hsh, lines_hsh)
     event = events.build(event_hsh)
     
     lines_hsh.each_value do |line|
@@ -97,8 +104,7 @@ class FiscalYear < ActiveRecord::Base
       event.event_lines.build(line)
     end
     
-    event.save
-    return event    
+    event
   end
   
   private
