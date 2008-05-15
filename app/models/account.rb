@@ -34,6 +34,10 @@ class Account < ActiveRecord::Base
     end
   end
   
+  def all_children
+    children + children.map(&:all_children).flatten
+  end
+  
   def result
     if account_number == "-1"
       self.children.map{|child| child.result}.sum

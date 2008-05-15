@@ -139,4 +139,25 @@ describe Account do
       @account.formatted_total(:month => 1..10).should == "+66.00"
     end
   end
+  
+  describe "all_children" do
+    before(:each) do
+      %w(@a @a1 @a1a @b @b1 @b2).each do |account|
+        instance_variable_set(account, 
+                              stub_model(Account) do |acc|
+                                acc.title = account
+                              end)
+      end
+      
+      @account.children << @a
+      @a.children << @a1
+      @a1.children << @a1a
+      @account.children << @b
+      @b.children.concat([@b1, @b2])
+    end
+    
+    it "should return the whole stack of children recursively" do
+      @account.all_children.should == [@a, @b, @a1, @a1a, @b1, @b2]
+    end
+  end
 end
