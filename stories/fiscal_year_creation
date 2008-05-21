@@ -35,4 +35,4 @@ Story: Creating a new fiscal year
     Then a new fiscal year should be created
     And the user should be shown a message that the fiscal year was created
     And the new fiscal year should have similar accounts as the existing year
-    And the balance sheet accounts should have equal balance with the corresponding accounts in the previous year
+    And the balance sheet accounts should have equal balance with the corresponding accounts in the previous year, except for the equity accounts

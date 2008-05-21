@@ -14,13 +14,34 @@ steps_for(:fiscal_year) do
                                 
     @fiscal_year_count += 1
     
-    @assets = @existing_fiscal_year.accounts.create(
+    @assets = @existing_fiscal_year.accounts.create!(
                                           :title => "Vastaavaa",
-                                          :account_number => "999")
+                                          :account_number => "-1")
+                                          
+                                      
+    @existing_fiscal_year.accounts.create!(
+        :title => "Vaihtuvat vastaavat",
+        :account_number => "-1",
+        :parent => @assets)
                                               
     @liabilities = @existing_fiscal_year.accounts.create(
                                           :title => "Vastattavaa",
-                                          :account_number => "998")
+                                          :account_number => "-1")
+    
+    @equity = @existing_fiscal_year.accounts.create(
+                                          :title => "OMA PÄÄOMA",
+                                          :account_number => "990",
+                                          :parent => @liabilities)
+    
+    @private_equity = @existing_fiscal_year.accounts.create(
+                                 :title => "Yksityistilit tilikaudella",
+                                 :account_number => "991",
+                                 :parent => @equity)
+                                  
+    @stockholders_equity = @existing_fiscal_year.accounts.create(
+                                 :title => "Oma pääoma (tilinavaus)",
+                                 :account_number => "997",
+                                 :parent => @equity)
                                 
     5.times do |i|
       account = Account.create!(
@@ -36,12 +57,16 @@ steps_for(:fiscal_year) do
                         :description => "Event #{i}",
                         :receipt_number => "000#{i}")
       amount = rand(10000)
+      real_accounts = @existing_fiscal_year.accounts - Account.find_virtual
       event.event_lines.build(
           {:amount => amount, 
-           :account => @existing_fiscal_year.accounts.rand})
+           :account => real_accounts.rand})
+           
+      debit_account = i == 3 ? @stockholders_equity : real_accounts.rand
+      
       event.event_lines.build(
           {:amount => (-1 * amount), 
-           :account => @existing_fiscal_year.accounts.rand})
+           :account => debit_account})
       event.save!
     end
   end
@@ -95,12 +120,13 @@ steps_for(:fiscal_year) do
       @existing_fiscal_year.assets.children.map(&:title)
   end
   
-  Then "the balance sheet accounts should have equal balance with the corresponding accounts in the previous year" do    
+  Then "the balance sheet accounts should have equal balance with the corresponding accounts in the previous year, except for the equity accounts" do    
     [:assets, :liabilities].each do |balance_sheet_account|
-      @fiscal_year.send(balance_sheet_account).children.each do |account|
-        account.total.should == 
-         @existing_fiscal_year.accounts.
-            find_by_account_number(account.account_number).total
+      @fiscal_year.send(balance_sheet_account).all_children.each do |account|
+        next if account == @fiscal_year.stockholders_equity
+        account.total.should == (@fiscal_year.equity.all_children.include?(account) ? 0 : 
+                                         @existing_fiscal_year.accounts.
+                                          find_by_account_number(account.account_number).total)
       end
     end 
   end

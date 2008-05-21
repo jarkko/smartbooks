@@ -21,9 +21,10 @@ module FiscalYearSpecHelper
     fiscal_year.stub!(:accounts).and_return([])
     
     FiscalYear.account_names.each do |key, name|
+      amount = (((-1) ** rand(2)) * rand(100000))
       account = stub_model(Account,
-                           :result => (((-1) ** rand(2)) *
-                                        rand(100000))) do |acc|
+                           :result => amount,
+                           :total => amount) do |acc|
         acc.title = name
       end
       

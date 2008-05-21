@@ -1,21 +1,7 @@
 class Account < ActiveRecord::Base
   acts_as_tree :order => "account_number"
-  has_many :event_lines
+  has_many :event_lines, :dependent => :destroy
   belongs_to :fiscal_year
-  
-  def self.parse_array(fiscal_year, arr, parent = nil)
-    new_account = fiscal_year.accounts.create!(:account_number => arr[1],
-                                :title => arr[2],
-                                :parent_id => parent ? parent.id : nil)
-                                
-    unless arr[3].blank?
-      arr[3].each do |account|
-        self.parse_array(fiscal_year, account, new_account)
-      end
-    end
-    
-    new_account
-  end
   
   def self.find_virtual
     find_all_by_account_number("-1")
@@ -82,5 +68,16 @@ class Account < ActiveRecord::Base
   
   def formatted_total(opts = {})
     total(opts.merge(:formatted => true))
+  end
+  
+  def open_account_from(original)
+    fiscal_year.create_event(
+      {:event_date => fiscal_year.start_date,
+       :description => "Tilinavaus (#{title})"},
+      [{:amount => original.total,
+        :account => self},
+       {:amount => (-1 * original.total),
+        :account => fiscal_year.stockholders_equity}]
+    )
   end
 end

@@ -15,8 +15,8 @@ describe "/fiscal_years/new.html.erb" do
     render "/fiscal_years/new"
     response.should have_tag("form[action=?][method=post]", fiscal_years_path) do
       with_tag "input[type=text][name='fiscal_year[description]']"
-      with_tag "input[type=text][name='fiscal_year[start_date]'][class=date]"
-      with_tag "input[type=text][name='fiscal_year[end_date]'][class=date]"
+      with_tag "input.date[type=text][name='fiscal_year[start_date]']"
+      with_tag "input.date[type=text][name='fiscal_year[end_date]']"
       with_tag "select[name='fiscal_year[copy_accounts_from]']" do
         @fiscal_years.each do |fy|
           with_tag "option[value=#{fy.id}]", fy.description

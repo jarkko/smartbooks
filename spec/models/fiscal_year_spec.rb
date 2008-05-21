@@ -2,7 +2,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe FiscalYear do
   before(:each) do
-    @fiscal_year = FiscalYear.new
+    @fiscal_year = FiscalYear.new(:start_date => Date.new(2008,1,1),
+                                  :end_date => Date.new(2008,12,31),
+                                  :description => "2008")
 
     FiscalYear.account_names.each do |key, name|
       instance_variable_set("@#{key}", mock_model(Account, :title => name))
@@ -29,6 +31,8 @@ describe FiscalYear do
   describe "creation" do
     before(:each) do
       @fiscal_year.connection.stub!(:insert).and_return(96)
+      @fiscal_year.connection.stub!(:update_sql).and_return(96)
+      
       
       @fy2 = mock_fiscal_year
       @root_accounts = @fy2.accounts - @bank_accounts.children -
@@ -64,10 +68,35 @@ describe FiscalYear do
       describe "and copy_balance set" do
         before(:each) do
           @fiscal_year.copy_balance = "1"
+          @fiscal_year.accounts.stub!(:select).and_return([@assets, @liabilities])
+          @fiscal_year.accounts.stub!(:detect).and_return(:equity)
+          @assets.stub!(:all_children).
+                and_return([@vat_receivables, @current_assets])
+          @liabilities.stub!(:all_children).
+                and_return([@vat_payable, @accounts_payable, @stockholders_equity, @private_equity])
+          
+          @equity = @fiscal_year.equity
+          @equity.stub!(:all_children).and_return([@stockholders_equity, @private_equity])      
+          @children = @liabilities.all_children + @assets.all_children - @equity.all_children
+          @children.each do |child|
+            child.stub!(:open_account_from)
+          end
         end
         
         it "should open the balance sheet accounts with the balance from the previous year" do
+          @children.each do |child|
+            original = @fy2.accounts.detect{|acc| acc.account_number == child.account_number}
+            child.should_receive(:open_account_from).with(original)
+          end
+          @fiscal_year.save
+        end
+        
+        it "should not open account for equity accounts" do
+          @equity.all_children.each do |child|
+            child.should_not_receive(:open_account_from)
+          end
           
+          @fiscal_year.save
         end
       end
     end
@@ -221,14 +250,15 @@ describe FiscalYear do
   describe "event creation" do
     before(:each) do
       @event = mock_model(Event, :event_lines => [],
-                                 :save => true)
+                                 :save! => true)
 
       @event.event_lines.stub!(:build)
       @lines = {
         "1" => {"debit" => "", "account_id" => "380", "credit" => "60"}, 
         "2" => {"debit" => "50", "account_id" => "398", "credit" => ""},
         "3" => {"debit" => "10", "account_id" => "359", "credit" => ""},
-        "4" => {"debit" => "", "account_id" => "357", "credit" => ""}}
+        "4" => {"debit" => "", "account_id" => "357", "credit" => ""},
+        "5" => {:amount => "25000", :account_id => "398"}}
 
       @fiscal_year.events.stub!(:build).and_return(@event)
     end
@@ -270,6 +300,15 @@ describe FiscalYear do
 
       it "should return the event" do
         @fiscal_year.build_event(@event, @lines).should == @event
+      end
+      
+      describe "when lines an array" do
+        before(:each) do
+          @lines = @lines.values
+        end
+        it "should still return the event" do
+          @fiscal_year.build_event(@event, @lines).should == @event
+        end
       end
     end
   end

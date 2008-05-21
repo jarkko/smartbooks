@@ -160,4 +160,31 @@ describe Account do
       @account.all_children.should == [@a, @b, @a1, @a1a, @b1, @b2]
     end
   end
+  
+  describe "open_account_from" do
+    before(:each) do
+      @fiscal_year = stub_model(FiscalYear, :stockholders_equity => :stockholders_equity) do |fy|
+        fy.start_date = Date.new(2008,1,1)
+        fy.end_date = Date.new(2008,12,31)
+      end
+      
+      @account.fiscal_year = @fiscal_year
+      @account.title = "Bank account"
+      
+      @original = stub_model(Account, :total => 45000)
+    end
+    
+    it "should open the account with an opening event copying the total of the corresponding source account" do
+      @fiscal_year.should_receive(:create_event).with(
+      {:event_date => @fiscal_year.start_date,
+       :description => "Tilinavaus (#{@account.title})"},
+      [{:amount => @original.total,
+        :account => @account},
+       {:amount => (-1 * @original.total),
+        :account => :stockholders_equity}]
+      )
+      
+      @account.open_account_from(@original)
+    end
+  end
 end

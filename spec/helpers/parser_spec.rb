@@ -12,7 +12,8 @@ module SampleData
     		       (date 2003 12 31)
     		       (account-map (account -1 "Vastaavaa" ((account 101 "Pankkitili")))
     		                    (account -1 "Vastattavaa" ((account 201 "Oma pääoma")))
-    				    (account -1 "Tulos" ((account 300 "Tulot") (account 400 "Menot"))))
+    				    (account -1 "Tulos" ((account 300 "Tulot") (account 400 "Menot"
+    				                                                  ((account 401 "Ostot"))))))
     		       ((event 1 (date 2003 1 1) "Tilinavaus" ((101 (money 123456)) (201 (money -123456)))))))
     END
   end
@@ -30,85 +31,97 @@ describe SexpParser, "fetch_date" do
   end
 end
 
-describe SexpParser do
-  include SampleData
-  
-  before(:each) do
-    @p = SexpParser.new(sample)
-  end
-  
-  it "should create new fiscal year" do
-    lambda {
-      @p.import
-    }.should change(FiscalYear, :count)
-  end
-end
+#describe SexpParser do
+#  include SampleData
+#  
+#  before(:each) do
+#    @p = SexpParser.new(sample)
+#  end
+#  
+#  it "should create new fiscal year" do
+#    lambda {
+#      @p.import
+#    }.should change(FiscalYear, :count)
+#  end
+#end
 
 describe SexpParser, ", creating new fiscal year" do
   include SampleData
   
   before(:each) do
     @p = SexpParser.new(sample)
-    @p.import
     
-    @fy = FiscalYear.find(:first, :order => "id desc")
+    @fy = stub_model(FiscalYear)
+    FiscalYear.stub!(:create!).and_return(@fy)
+    @fy.stub!(:create_account_from_array)
+    
+    @accounts = sample.parse_sexp[5][4][1..-1]
   end
   
-  it "should create new fiscal year with correct start date" do
-    @fy.start_date.to_s.should == "2003-01-01"
-  end
+  #it "should create new fiscal year with correct start date" do
+  #  @fy.start_date.to_s.should == "2003-01-01"
+  #end
+  #
+  #it "should create new fiscal year with correct end date" do
+  #  @fy.end_date.to_s.should == "2003-12-31"
+  #end
+  #
+  #it "should create new fiscal year with correct description" do
+  #  @fy.description.should == "Esimerkkiyhdistys ery"
+  #end
   
-  it "should create new fiscal year with correct end date" do
-    @fy.end_date.to_s.should == "2003-12-31"
-  end
-  
-  it "should create new fiscal year with correct description" do
-    @fy.description.should == "Esimerkkiyhdistys ery"
+  it "should create new fiscal year with correct input" do
+    FiscalYear.should_receive(:create!).with({
+      :description => "Esimerkkiyhdistys ery",
+      :start_date => "2003-01-01",
+      :end_date => "2003-12-31"
+    }).and_return(@fy)
+    @p.import
   end
   
   it "should create seven new accounts" do
-    @fy.accounts.size.should == 7
+    @accounts.each do |account|
+      @fy.should_receive(:create_account_from_array).with(account)
+    end
+    @p.import
   end
   
-  it "should create two new event lines" do
-    EventLine.find(:all).size.should == 2
-  end
-  
-  it "should create a new event" do
-    @fy.events.size.should == 1
-  end
+  #it "should create seven new accounts" do
+  #  @fy.accounts.size.should == 7
+  #end
+  #
+  #it "should create two new event lines" do
+  #  EventLine.find(:all).size.should == 2
+  #end
+  #
+  #it "should create a new event" do
+  #  @fy.events.size.should == 1
+  #end
 end
 
-describe Account, "parsing" do
-  fixtures :fiscal_years, :accounts
-  
+describe FiscalYear, "create_account_from_array" do
   include SampleData
   
   before(:each) do
-    @accounts = sample.parse_sexp[5][4]
-    @fy = fiscal_years(:year2007)
-  end
-  
-  it "should create account with correct name" do
-    Account.parse_array(@fy, @accounts.last.last.first)
-    @fy.accounts.find(:first, :order => "id desc").title.should == "Tulot"
-  end
-  
-  it "should create right amount of Accounts" do
-    lambda {
-      @accounts[1..-1].each do |account|
-        Account.parse_array(@fy, account)
-      end
-    }.should change(Account, :count).by(7)
-  end
-  
-  it "should create correct tree structure" do
-    @accounts[1..-1].each do |account|
-      Account.parse_array(@fy, account)
-    end
+    @accounts = sample.parse_sexp[5][4][3]
+    @fy = stub_model(FiscalYear)
     
-    Account.find_by_title("Tulos").children.should == Account.find_all_by_title(["Tulot", "Menot"])
-    Account.find_by_title("Vastattavaa").children.should == Account.find_all_by_title("Oma pääoma")
+    @sample_accounts = 
+      [{:account_number => "-1", :title => "Tulos", :parent => nil},
+       {:account_number => "300", :title => "Tulot", :parent => :tulos},
+       {:account_number => "400", :title => "Menot", :parent => :tulos},
+       {:account_number => "401", :title => "Ostot", :parent => :menot}]
+  end
+  
+  it "should create account with correct details" do
+    @sample_accounts.each do |account|
+      @fy.accounts.should_receive(:create!).with({
+        :account_number => account[:account_number],
+        :title => account[:title],
+        :parent => account[:parent]
+      }).and_return(account[:title].downcase.to_sym)
+    end
+    @fy.create_account_from_array(@accounts)
   end
 end
 

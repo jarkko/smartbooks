@@ -1,10 +1,13 @@
 class FiscalYear < ActiveRecord::Base
   attr_accessor :copy_accounts_from, :copy_balance
   
+  validates_presence_of :start_date, :end_date, :description
+  
   has_many :accounts
   has_many :events
   
   before_create :copy_accounts_if_needed
+  after_create :copy_balance_if_needed
   
   def payable_vat_for(month)
     sum = vat_balance_for(month)
@@ -20,6 +23,7 @@ class FiscalYear < ActiveRecord::Base
   
   def FiscalYear.account_names
     {:assets => "Vastaavaa",
+     :liabilities => "Vastattavaa",
      :current_assets => "VAIHTUVAT VASTAAVAT",
      :longterm_assets => "PYSYVÄT VASTAAVAT",
      :vat_debt => "Arvonlisäverovelka 22%",
@@ -40,6 +44,7 @@ class FiscalYear < ActiveRecord::Base
      :accounts_receivable => "Myyntisaamiset",
      :vat_returns => "Anotut arvonlisäveropalautukset",
      :equipment => "Koneet ja kalusto",
+     :equity => "OMA PÄÄOMA",
      :stockholders_equity => "Oma pääoma (tilinavaus)",
      :private_equity => "Yksityistilit tilikaudella",
      :cash_private_investments => "Yksityissijoitukset rahana",
@@ -90,21 +95,41 @@ class FiscalYear < ActiveRecord::Base
   end
   
   def create_event(event_hsh, lines_hsh)
+    logger.debug("*** Creating event with the following details: event: #{event_hsh.inspect}\n lines_hsh: #{lines_hsh.inspect}")
     event = build_event(event_hsh, lines_hsh)
-    
-    event.save
-    return event    
+    event.save!
+    return event
   end
   
   def build_event(event_hsh, lines_hsh)
     event = events.build(event_hsh)
-    
-    lines_hsh.each_value do |line|
-      next if %w(credit debit).all? { |i| line[i].blank? }
-      event.event_lines.build(line)
+    lines = lines_hsh.respond_to?(:values) ? lines_hsh.values : lines_hsh
+    lines.each do |line|
+      line.stringify_keys!
+      next if %w(credit debit amount).all? { |i| line[i].blank? }
+      el = event.event_lines.build(line)
     end
     
     event
+  end
+  
+  def create_account_from_array(arr, parent = nil)
+    logger.debug("++++ accounts: #{arr.inspect}")
+    
+    logger.debug("::::: create_account_from_array called with arr: #{arr.inspect}, parent: #{parent.inspect}")
+    
+    logger.debug("** calling create! with account number: #{arr[1].to_s.to_i.to_s.inspect}, title: #{arr[2].inspect}, parent: #{parent.inspect}")
+    new_account = accounts.create!(:account_number => arr[1].to_s.to_i.to_s,
+                                   :title => arr[2],
+                                   :parent => parent)
+    
+    unless arr[3].blank?
+      arr[3].each do |account|
+        create_account_from_array(account, new_account)
+      end
+    end
+    
+    new_account
   end
   
   private
@@ -119,6 +144,11 @@ class FiscalYear < ActiveRecord::Base
     copy_accounts(copy_accounts_from)
   end
   
+  def copy_balance_if_needed
+    return true if copy_accounts_from.blank? || copy_balance.blank?
+    copy_balance_from(copy_accounts_from)
+  end
+  
   def copy_accounts(source_year)
     source = FiscalYear.find(source_year)
     source.accounts.find_all_by_parent_id(nil).each do |source_account|
@@ -127,14 +157,41 @@ class FiscalYear < ActiveRecord::Base
   end
   
   def copy_account(source_account)
+    logger.debug("*** COPYING ACCOUNT #{source_account.inspect}")
     account = accounts.build(source_account.attributes.except("id").
                             except("fiscal_year_id").
                             except("parent_id"))
-        
+    
+    logger.debug("** BUILT ACCOUNT #{account.inspect}")
+    
     source_account.children.each do |child|
       account.children << copy_account(child)
     end
     
     account
+  end
+  
+  def copy_balance_from(source_year)
+    source = FiscalYear.find(source_year)
+    balance_accounts = accounts.select do |acc|
+      %w(Vastaavaa Vastattavaa).include?(acc.title)
+    end
+        
+    balance_accounts.each do |account|
+      account.all_children.each do |child|
+        original = source.accounts.detect do |acc|
+          acc.account_number == child.account_number &&
+          acc.description == child.description
+        end
+        
+        next if equity.all_children.include?(child) || 
+                child.account_number == "-1" || 
+                original.total == 0
+        
+        logger.debug("*** copying balance for #{child.title}")
+        logger.debug("*** balance: #{original.total}")
+        child.open_account_from(original)
+      end
+    end
   end
 end

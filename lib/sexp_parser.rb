@@ -13,7 +13,8 @@ class SexpParser
 
     @accounts = @year[4][1..-1]
     @accounts.each do |account|
-      Account.parse_array(@fy, account)
+      @fy.create_account_from_array(account)
+      #Account.parse_array(@fy, account)
     end
     
     Event.parse_events(@fy, @year[5])
