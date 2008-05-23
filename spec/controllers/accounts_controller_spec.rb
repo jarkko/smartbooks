@@ -1,36 +1,34 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-#describe AccountsController, " handling GET /accounts" do
-#
-#  before do
-#    @account = mock_model(Account)
-#    Account.stub!(:find).and_return([@account])
-#  end
-#  
-#  def do_get
-#    get :index
-#  end
-#  
-#  it "should be successful" do
-#    do_get
-#    response.should be_success
-#  end
-#
-#  it "should render index template" do
-#    do_get
-#    response.should render_template('index')
-#  end
-#  
-#  it "should find all accounts" do
-#    Account.should_receive(:find).with(:all).and_return([@account])
-#    do_get
-#  end
-#  
-#  it "should assign the found accounts for the view" do
-#    do_get
-#    assigns[:accounts].should == [@account]
-#  end
-#end
+describe AccountsController, " handling GET /accounts.js" do
+
+  before do
+    @account = stub_model(Account)
+    @accounts = [@account]
+    @fiscal_year = stub_model(FiscalYear, :account => @accounts)
+    FiscalYear.stub!(:find).and_return(@fiscal_year)
+    @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(@accounts) 
+  end
+  
+  def do_get
+    get :index, :format => "js"
+  end
+  
+  it "should be successful" do
+    do_get
+    response.should be_success
+  end
+  
+  it "should assign accounts correctly" do
+    do_get
+    assigns[:accounts].should == @accounts
+  end
+
+  it "should render accounts as json" do
+    do_get
+    response.should have_text("var accounts = " + @accounts.to_json(:only => [:title, :id]))
+  end
+end
 #
 #describe AccountsController, " handling GET /accounts.xml" do
 #

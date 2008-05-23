@@ -1,0 +1,124 @@
+#events > li {
+  position: relative;
+  overflow: hidden;
+}
+
+.event_date {
+	width: 10em;
+	float: left;
+	}
+
+.event_id {
+	float: left;
+	width: 5em;
+	}
+
+.event_line_amount {
+	float: right;
+	width: 29%;
+	text-align: right;
+	}
+
+.event_lines li { width: 70%; }
+.positive { color: green; }
+.negative { color: red; }
+
+.event_line_account {
+	width: 70%;
+	float: left;
+	clear: all;
+	}
+
+.event_lines li {
+	list-style: none;
+}
+
+#events .event_lines li {
+  overflow: hidden;
+}
+
+.event_lines {
+	margin-left: 0;
+	padding-left: 0;
+	clear: both;
+	overflow: hidden;
+	}
+
+.description { float: left; }
+#events { list-style: none; }
+
+#event_form li h4 {
+	margin: 0;
+	margin-left: 20em;
+	}
+
+#event_form .account {
+	width: 20em;
+	float: left;
+	}
+
+#event_form .account select { width: 20em; }
+
+.account_list {
+  background-color: #ddd;
+  border: 1px solid #666;
+  overflow: hidden;
+}
+
+#event_form .account_list ul {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#event_form .account_list ul li {
+  margin: 0;
+  padding: 2px;
+  width: 100%;
+  border: 0;
+}
+
+#event_form .account_list ul li:hover {
+  cursor: pointer;
+}
+
+.debit {
+	width: 5em;
+	float: left;
+	}
+	
+	/* Date Picker */
+  table.calendar {
+    background-color: #fff;
+    border: 1px solid #aaa;
+    border-spacing: 0;
+  }
+  table.calendar tbody tr:hover {
+    background-color: #fff;
+  }
+  .calendar td,
+  .calendar th {
+    border: 1px solid #fff;
+    margin: 0;
+    padding: 2px;
+  }
+  .calendar a {
+    display: block;
+  }
+  .calendar td.day:hover {
+    border-color: #aaa;
+  }
+  .calendar .today {
+    background-color: #FFF063;
+  }
+  .calendar .selected {
+    border-color: #858728;
+  }
+  .calendar .weekend {
+    background-color: #ccc;
+    border-color: #ccc;
+  }
+
+.account_list .selected {
+  background-color: #3e3;
+}

@@ -46,7 +46,7 @@ class EventsController < ApplicationController
     session[:forms] << @form_token
     
     @event = Event.new
-    @accounts = Account.find_for_dropdown
+    @accounts = @fiscal_year.accounts.find_for_dropdown
     @lines = []
     4.times { @lines << EventLine.new }
   end
@@ -107,17 +107,6 @@ class EventsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to events_url }
       format.xml  { head :ok }
-    end
-  end
-  
-  private
-  
-  def get_fiscal_year
-    @fiscal_year = FiscalYear.find(params[:fiscal_year_id]) rescue nil
-    
-    unless @fiscal_year
-      not_found
-      return false
     end
   end
 end

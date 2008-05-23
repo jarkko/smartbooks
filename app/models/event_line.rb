@@ -1,4 +1,6 @@
 class EventLine < ActiveRecord::Base
+  attr_accessor :account_name
+  
   belongs_to :account
   belongs_to :event
   

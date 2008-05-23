@@ -1,20 +1,18 @@
 class AccountsController < ApplicationController
-  # GET /accounts
-  # GET /accounts.xml
-  #def index
-  #  @accounts = Account.find(:all)
-  #
-  #  respond_to do |format|
-  #    format.html # index.rhtml
-  #    format.xml  { render :xml => @accounts.to_xml }
-  #  end
-  #end
+  before_filter :get_fiscal_year
+
+  def index
+    @accounts = @fiscal_year.accounts.find_for_dropdown
+  
+    respond_to do |format|
+      format.html # index.rhtml
+      format.js  { render :json => "var accounts = " + @accounts.to_json(:only => [:title, :id]) }
+    end
+  end
 
   # GET /accounts/1
   # GET /accounts/1.xml
   def show
-    @fiscal_year = FiscalYear.find(params[:fiscal_year_id])
-    
     options = {:include => [:event_lines => :event]}
     
     if params[:start_date]

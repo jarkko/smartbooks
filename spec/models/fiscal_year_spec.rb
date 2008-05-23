@@ -250,7 +250,7 @@ describe FiscalYear do
   describe "event creation" do
     before(:each) do
       @event = mock_model(Event, :event_lines => [],
-                                 :save! => true)
+                                 :save => true)
 
       @event.event_lines.stub!(:build)
       @lines = {

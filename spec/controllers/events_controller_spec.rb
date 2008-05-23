@@ -230,6 +230,9 @@ describe EventsController, " handling GET /events/new" do
   before do
     @event = mock_model(Event)
     Event.stub!(:new).and_return(@event)
+    @fiscal_year = stub_model(FiscalYear, :accounts => [])
+    @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(:accounts)
+    FiscalYear.stub!(:find).and_return(@fiscal_year)
   end
   
   def do_get
@@ -266,9 +269,9 @@ describe EventsController, " handling GET /events/new" do
     assigns[:lines].size.should == 4
   end
   
-  it "should call Account.find_for_dropdown" do
-    Account.should_receive(:find_for_dropdown)
+  it "should get accounts from the current fiscal year" do
     do_get
+    assigns[:accounts].should equal(@fiscal_year.accounts.find_for_dropdown)
   end
 end
 
