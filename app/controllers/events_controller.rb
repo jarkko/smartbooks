@@ -28,17 +28,6 @@ class EventsController < ApplicationController
     @events = @fiscal_year.events.find(:all, options)
   end
 
-  # GET /events/1
-  # GET /events/1.xml
-  def show
-    @event = Event.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.rhtml
-      format.xml  { render :xml => @event.to_xml }
-    end
-  end
-
   # GET /events/new
   def new
     session[:forms] ||= []
@@ -58,14 +47,7 @@ class EventsController < ApplicationController
 
   # POST /events
   # POST /events.xml
-  def create
-    #unless params[:form_token] && 
-    #       session[:forms].include?(params[:form_token])
-    #  flash[:warning] = "The form was already posted"
-    #  return redirect_to(fiscal_year_events_path(@fiscal_year))
-    #end
-    #session[:forms].delete(params[:form_token])
-    
+  def create  
     @event = @fiscal_year.create_event(params[:event], params[:line])
     @event.save!
     flash[:notice] = 'Event was successfully created.'
@@ -79,34 +61,5 @@ class EventsController < ApplicationController
     @accounts = Account.find_for_dropdown
 
     render :action => "new"
-  end
-
-  # PUT /events/1
-  # PUT /events/1.xml
-  def update
-    @event = Event.find(params[:id])
-
-    respond_to do |format|
-      if @event.update_attributes(params[:event])
-        flash[:notice] = 'Event was successfully updated.'
-        format.html { redirect_to event_url(@event) }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @event.errors.to_xml }
-      end
-    end
-  end
-
-  # DELETE /events/1
-  # DELETE /events/1.xml
-  def destroy
-    @event = Event.find(params[:id])
-    @event.destroy
-
-    respond_to do |format|
-      format.html { redirect_to events_url }
-      format.xml  { head :ok }
-    end
   end
 end

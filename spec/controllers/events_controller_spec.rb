@@ -11,19 +11,19 @@ describe EventsController, "#route_for" do
   end
   
   it "should map { :controller => 'events', :action => 'show', :id => 1 } to /events/1" do
-    route_for(:controller => "events", :action => "show", :id => 1, :fiscal_year_id => 1).should == "/fiscal_years/1/events/1"
+    route_for(:controller => "events", :action => "show", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1"
   end
   
   it "should map { :controller => 'events', :action => 'edit', :id => 1 } to /events/1;edit" do
-    route_for(:controller => "events", :action => "edit", :id => 1, :fiscal_year_id => 1).should == "/fiscal_years/1/events/1/edit"
+    route_for(:controller => "events", :action => "edit", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1/edit"
   end
   
   it "should map { :controller => 'events', :action => 'update', :id => 1} to /events/1" do
-    route_for(:controller => "events", :action => "update", :id => 1, :fiscal_year_id => 1).should == "/fiscal_years/1/events/1"
+    route_for(:controller => "events", :action => "update", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1"
   end
   
   it "should map { :controller => 'events', :action => 'destroy', :id => 1} to /events/1" do
-    route_for(:controller => "events", :action => "destroy", :id => 1, :fiscal_year_id => 1).should == "/fiscal_years/1/events/1"
+    route_for(:controller => "events", :action => "destroy", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1"
   end
   
 end
@@ -134,98 +134,6 @@ describe EventsController, " handling GET /events with start_date and end_date" 
   end
 end
 
-#describe EventsController, " handling GET /events.xml" do
-#
-#  before do
-#    @event = mock_model(Event, :to_xml => "XML")
-#    Event.stub!(:find).and_return(@event)
-#    @fy = mock_model(FiscalYear)
-#    FiscalYear.stub!(:find).and_return(@fy)
-#  end
-#  
-#  def do_get
-#    @request.env["HTTP_ACCEPT"] = "application/xml"
-#    get :index, :fiscal_year_id => 1
-#  end
-#  
-#  it "should be successful" do
-#    do_get
-#    response.should be_success
-#  end
-#
-#  it "should find all events" do
-#    Event.should_receive(:find).with(:all, :order => "event_date, receipt_number").and_return([@event])
-#    do_get
-#  end
-#  
-#  it "should render the found events as xml" do
-#    @event.should_receive(:to_xml).and_return("XML")
-#    do_get
-#    response.body.should == "XML"
-#  end
-#end
-
-#describe EventsController, " handling GET /events/1" do
-#
-#  before do
-#    @event = mock_model(Event)
-#    Event.stub!(:find).and_return(@event)
-#  end
-#  
-#  def do_get
-#    get :show, :id => "1", :fiscal_year_id => 1
-#  end
-#
-#  it "should be successful" do
-#    do_get
-#    response.should be_success
-#  end
-#  
-#  it "should render show template" do
-#    do_get
-#    response.should render_template('show')
-#  end
-#  
-#  it "should find the event requested" do
-#    Event.should_receive(:find).with("1").and_return(@event)
-#    do_get
-#  end
-#  
-#  it "should assign the found event for the view" do
-#    do_get
-#    assigns[:event].should equal(@event)
-#  end
-#end
-
-#describe EventsController, " handling GET /events/1.xml" do
-#
-#  before do
-#    @event = mock_model(Event, :to_xml => "XML")
-#    Event.stub!(:find).and_return(@event)
-#  end
-#  
-#  def do_get
-#    @request.env["HTTP_ACCEPT"] = "application/xml"
-#    get :show, :id => "1", :fiscal_year_id => 1
-#  end
-#
-#  it "should be successful" do
-#    do_get
-#    response.should be_success
-#  end
-#  
-#  it "should find the event requested" do
-#    Event.should_receive(:find).with("1").and_return(@event)
-#    do_get
-#  end
-#  
-#  it "should render the found event as xml" do
-#    @event.should_receive(:to_xml).and_return("XML")
-#    do_get
-#    response.body.should == "XML"
-#  end
-#end
-
 describe EventsController, " handling GET /events/new" do
   before do
     @event = mock_model(Event)
@@ -274,38 +182,6 @@ describe EventsController, " handling GET /events/new" do
     assigns[:accounts].should equal(@fiscal_year.accounts.find_for_dropdown)
   end
 end
-
-#describe EventsController, " handling GET /events/1/edit" do
-#
-#  before do
-#    @event = mock_model(Event)
-#    Event.stub!(:find).and_return(@event)
-#  end
-#  
-#  def do_get
-#    get :edit, :id => "1", :fiscal_year_id => 1
-#  end
-#
-#  it "should be successful" do
-#    do_get
-#    response.should be_success
-#  end
-#  
-#  it "should render edit template" do
-#    do_get
-#    response.should render_template('edit')
-#  end
-#  
-#  it "should find the event requested" do
-#    Event.should_receive(:find).and_return(@event)
-#    do_get
-#  end
-#  
-#  it "should assign the found Event for the view" do
-#    do_get
-#    assigns[:event].should equal(@event)
-#  end
-#end
 
 describe EventsController, " handling POST /events without fiscal year id" do
   include EventsControllerSpecHelper
@@ -393,63 +269,3 @@ describe EventsController, " handling POST /events" do
     end
   end
 end
-
-#describe EventsController, " handling PUT /events/1" do
-#
-#  before do
-#    @event = mock_model(Event, :to_param => "1", :update_attributes => true)
-#    Event.stub!(:find).and_return(@event)
-#  end
-#  
-#  def do_update
-#    put :update, :id => "1", :fiscal_year_id => 1
-#  end
-#  
-#  it "should find the event requested" do
-#    Event.should_receive(:find).with("1").and_return(@event)
-#    do_update
-#  end
-#
-#  it "should update the found event" do
-#    @event.should_receive(:update_attributes)
-#    do_update
-#    assigns(:event).should equal(@event)
-#  end
-#
-#  it "should assign the found event for the view" do
-#    do_update
-#    assigns(:event).should equal(@event)
-#  end
-#
-#  it "should redirect to the event" do
-#    do_update
-#    response.should redirect_to(event_url("1"))
-#  end
-#end
-#
-#describe EventsController, " handling DELETE /events/1" do
-#
-#  before do
-#    @event = mock_model(Event, :destroy => true)
-#    Event.stub!(:find).and_return(@event)
-#  end
-#  
-#  def do_delete
-#    delete :destroy, :id => "1", :fiscal_year_id => 1
-#  end
-#
-#  it "should find the event requested" do
-#    Event.should_receive(:find).with("1").and_return(@event)
-#    do_delete
-#  end
-#  
-#  it "should call destroy on the found event" do
-#    @event.should_receive(:destroy)
-#    do_delete
-#  end
-#  
-#  it "should redirect to the events list" do
-#    do_delete
-#    response.should redirect_to(events_url)
-#  end
-#end
