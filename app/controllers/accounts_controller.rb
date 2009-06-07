@@ -1,6 +1,14 @@
 class AccountsController < ApplicationController
   before_filter :get_fiscal_year
 
+  def index
+    @accounts = @fiscal_year.accounts.find_for_dropdown
+  
+    respond_to do |format|
+      format.js { render :json => "var accounts = " + @accounts.to_json(:only => [:title, :id]) }
+    end
+  end
+
   def show
     options = {:include => [:event_lines => :event]}
     
