@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe "/events/new.html.erb" do
+describe "/events/edit.html.erb" do
   include EventsHelper
 
   def check_lines
@@ -19,10 +19,10 @@ describe "/events/new.html.erb" do
   end
   
   def create_objects
-    @event = Factory.build(:event)
-
+    @event = Factory.build(:event, :id => "100")
+    @event.stub!(:new_record?).and_return(false)
     @fiscal_year = Factory.build(:fiscal_year)
-    @account = Factory(:account)
+    @account = Factory(:account)               
   end
   
   describe "when lines have an id" do
@@ -36,33 +36,16 @@ describe "/events/new.html.erb" do
 
       create_objects
       set_assigns
-      render "/events/new.html.erb"
+      render "/events/edit.html.erb"
     end
 
-    it "should render new form" do    
-      response.should have_tag("form[action=?][method=post]", fiscal_year_events_path(@fiscal_year)) do
+    it "should render new form" do
+      response.should have_tag("form[action=?][method=post]", fiscal_year_event_path(@fiscal_year, @event)) do
         with_tag("input[type=submit]")
         with_tag("input#event_description")
         with_tag("input#event_receipt_number")
         with_tag("input[type=text][name='event[event_date]']")
       end
-    end
-
-    it "should show four line forms using ids" do
-      check_lines
-    end
-  end
-  
-  describe "when lines don't have ids" do
-    before do
-      @lines = []
-      (1..4).each do |i|
-        line = EventLine.new
-        @lines << line
-      end
-      create_objects
-      set_assigns
-      render "/events/new.html.erb"
     end
 
     it "should show four line forms using ids" do

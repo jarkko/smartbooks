@@ -73,3 +73,12 @@ div.progressBar div.background {
 	height: 18px;
 	width: 0%;
 	}
+	
+.edit_event_link {
+  margin-left: 2em;
+  visibility: hidden;
+}
+
+#events li:hover .edit_event_link {
+  visibility: visible;
+}

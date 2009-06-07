@@ -1,3 +1,4 @@
+<% @page_title = "Events for #{@fiscal_year.description}" %>
 <% content_for :javascript do %>
   <%= javascript_include_tag 'date_selector', 'fiscal_years/index' %>
 <% end %>
@@ -35,6 +36,8 @@
       <span class="description">
         <%=h event.description %>
       </span>
+      
+      <%= link_to "Edit", edit_fiscal_year_event_path(@fiscal_year, event), :class => "edit_event_link" %>
     </h4>
     
     <ul class="event_lines">

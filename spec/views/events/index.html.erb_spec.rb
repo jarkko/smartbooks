@@ -35,7 +35,7 @@ describe "/events/index.html.erb" do
     end
     
     assigns[:events] = @events
-    assigns[:fiscal_year] = @fy = mock_model(FiscalYear)
+    assigns[:fiscal_year] = @fy = stub_model(FiscalYear)
   end
 
   it "should render list of events" do
