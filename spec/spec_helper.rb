@@ -130,8 +130,8 @@ module EventsControllerSpecHelper
                 "event_date(3i)" => "27"}}
   end
   
-  def do_post
-    post :create, valid_attributes.except(:fiscal_year_id)
+  def do_post(params = {})
+    post :create, valid_attributes.except(:fiscal_year_id).merge(params)
   end
 
   def event_lines

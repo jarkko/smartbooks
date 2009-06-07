@@ -154,26 +154,27 @@ describe EventsController, " handling GET /events/new" do
   end
 end
 
-describe EventsController, " handling POST /events without fiscal year id" do
+describe EventsController, " handling POST /events when fiscal year not found" do
   include EventsControllerSpecHelper
   
   before(:each) do
     @event = mock_model(Event)
     Event.stub!(:new).and_return(@event)
+    FiscalYear.should_receive(:find).with("69").and_return(nil)
   end
   
   it "should not create new event" do
     Event.should_not_receive(:new)
-    do_post
+    do_post(:fiscal_year_id => "69")
   end
   
   it "should not save event" do
     @event.should_not_receive(:save)
-    do_post
+    do_post(:fiscal_year_id => "69")
   end
   
   it "should return not found" do
-    do_post
+    do_post(:fiscal_year_id => "69")
     response.response_code.should == 404
   end
 end
@@ -196,16 +197,16 @@ describe EventsController, " handling POST /events" do
                     with(valid_attributes[:event].stringify_keys,
                          valid_attributes[:line]).
                     and_return(@event)
-    do_post
+    do_post(:fiscal_year_id => @fy.id)
   end
   
   it "should redirect to the event list" do
-    do_post
+    do_post(:fiscal_year_id => @fy.id)
     response.should redirect_to(fiscal_year_events_path(:fiscal_year_id => @fy, :anchor => "event_#{@event.to_param}"))
   end
   
   it "should show correct flash" do
-    do_post
+    do_post(:fiscal_year_id => @fy.id)
     flash[:notice].should == 'Event was successfully created.'
   end
 
@@ -220,22 +221,22 @@ describe EventsController, " handling POST /events" do
     end
     
     it "should show the form again" do
-      do_post
+      do_post(:fiscal_year_id => @fy.id)
       response.should render_template("new")
     end
 
     it "should show correct flash" do
-      do_post
+      do_post(:fiscal_year_id => @fy.id)
       flash[:warning].should == 'Saving event failed.'
     end
 
     it "should set event lines correctly" do
-      do_post
+      do_post(:fiscal_year_id => @fy.id)
       assigns[:lines].should == @event.event_lines
     end
 
     it "should set accounts correctly" do
-      do_post
+      do_post(:fiscal_year_id => @fy.id)
       assigns[:accounts].should == @accounts
     end
   end
