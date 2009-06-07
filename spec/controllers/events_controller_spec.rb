@@ -1,33 +1,4 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-
-describe EventsController, "#route_for" do
-
-  it "should map { :controller => 'events', :action => 'index' } to /events" do
-    route_for(:controller => "events", :action => "index").should == "/events"
-  end
-  
-  it "should map { :controller => 'events', :action => 'new' } to /events/new" do
-    route_for(:controller => "events", :action => "new").should == "/events/new"
-  end
-  
-  it "should map { :controller => 'events', :action => 'show', :id => 1 } to /events/1" do
-    route_for(:controller => "events", :action => "show", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1"
-  end
-  
-  it "should map { :controller => 'events', :action => 'edit', :id => 1 } to /events/1;edit" do
-    route_for(:controller => "events", :action => "edit", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1/edit"
-  end
-  
-  it "should map { :controller => 'events', :action => 'update', :id => 1} to /events/1" do
-    route_for(:controller => "events", :action => "update", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1"
-  end
-  
-  it "should map { :controller => 'events', :action => 'destroy', :id => 1} to /events/1" do
-    route_for(:controller => "events", :action => "destroy", :id => "1", :fiscal_year_id => "1").should == "/fiscal_years/1/events/1"
-  end
-  
-end
-
 describe "GET /events general", :shared => true do
   it "should be successful" do
     do_get
