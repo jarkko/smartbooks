@@ -52,6 +52,6 @@
   </ul>
 
   <p>
-    <%= submit_tag "Create" %>
+    <%= submit_tag @event.new_record? ? "Create" : "Save" %>
   </p>
 <% end %>

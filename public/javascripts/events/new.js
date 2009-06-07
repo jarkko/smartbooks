@@ -121,7 +121,7 @@ function fillFirstEmptyLine(value) {
 function findFirstEmptyLine() {
   var line = $$('.event_lines li').detect(function(line) {
     return line.select('.account').size() != 0 &&
-           line.select('.account input').first().value == ""
+           line.select('.account input, .account select').first().value == ""
   });
   return line;
 }

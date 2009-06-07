@@ -90,7 +90,7 @@ describe EventsController do
   
   describe "handling GET /events/new" do
     before do
-      @event = mock_model(Event)
+      @event = Factory.build(:event)
       Event.stub!(:new).and_return(@event)
       @fiscal_year = stub_model(FiscalYear, :accounts => [])
       @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(:accounts)
@@ -223,5 +223,63 @@ describe EventsController do
         assigns[:accounts].should == @accounts
       end
     end   
+  end
+
+  describe "handling GET /events/edit" do
+    before do
+      @event = Factory.build(:event)
+      Event.stub!(:find).with("69").and_return(@event)
+      @event_lines = []
+      2.times do
+        event_line = Factory.build(:event_line)
+        @event_lines << event_line
+      end
+      @event.stub!(:event_lines).and_return(@event_lines)
+      
+      @fiscal_year = stub_model(FiscalYear, :accounts => [])
+      @fiscal_year.stub!(:events).and_return([])
+      @fiscal_year.events.stub!(:find).and_return(@event)
+      @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(:accounts)
+      FiscalYear.stub!(:find).and_return(@fiscal_year)
+    end
+
+    def do_get
+      get :edit, :fiscal_year_id => 1, :id => 69
+    end
+
+    it "should be successful" do
+      do_get
+      response.should be_success
+    end
+
+    it "should render edit template" do
+      do_get
+      response.should render_template('edit')
+    end
+
+    it "should create a new event" do
+      @fiscal_year.events.should_receive(:find).with("69").and_return(@event)
+      do_get
+    end
+
+    it "should not save the new event" do
+      @event.should_not_receive(:save)
+      do_get
+    end
+
+    it "should assign the new event for the view" do
+      do_get
+      assigns[:event].should equal(@event)
+    end
+
+    it "should create four new event lines" do
+      do_get
+      assigns[:lines].size.should == 4
+    end
+
+    it "should get accounts from the current fiscal year" do
+      do_get
+      assigns[:accounts].should equal(@fiscal_year.accounts.find_for_dropdown)
+    end
   end
 end

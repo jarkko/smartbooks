@@ -42,7 +42,11 @@ class EventsController < ApplicationController
 
   # GET /events/1;edit
   def edit
-    @event = Event.find(params[:id])
+    @event = @fiscal_year.events.find(params[:id])
+    @accounts = @fiscal_year.accounts.find_for_dropdown
+    @lines = []
+    @lines += @event.event_lines
+    2.times { @lines << EventLine.new }
   end
 
   # POST /events
