@@ -132,6 +132,14 @@ class FiscalYear < ActiveRecord::Base
     new_account
   end
   
+  def timeline
+    [start_date, end_date].map{|d| "#{d.day}.#{d.month}.#{d.year}"}.join(" - ")
+  end
+  
+  def description_with_dates
+    "#{description} (#{timeline})".strip
+  end
+  
   private
   
   def vat_balance_for(month)

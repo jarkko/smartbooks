@@ -247,6 +247,18 @@ describe FiscalYear do
     end
   end
   
+  describe "timeline" do
+    it "should print out pretty timeline" do
+      @fiscal_year.timeline.should == "1.1.2008 - 31.12.2008"
+    end
+  end
+  
+  describe "description_with_dates" do
+    it "should print out description with dates" do
+      @fiscal_year.description_with_dates.should == "2008 (1.1.2008 - 31.12.2008)"
+    end
+  end
+  
   describe "event creation" do
     before(:each) do
       @event = mock_model(Event, :event_lines => [],

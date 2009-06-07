@@ -38,7 +38,11 @@
     <tr>
       <td>Edellisten kausien vähentämättä jääneet verot</td>
       <td>
-        <%= @receivables.formatted_total(:month => 1..(params[:month].to_i - 1)) %>
+        <% if params[:month].to_i == 1 %>
+          0
+        <% else %>
+          <%= @receivables.formatted_total(:month => 1..(params[:month].to_i - 1)) %>
+        <% end %>
       </td>
     </tr>
     

@@ -1,0 +1,7 @@
+<ul id="fiscal_years">
+  <% @fiscal_years.each do |fy| %>
+  <li id="fiscal_year_<%= fy.id %>">
+    <%= link_to fy.description_with_dates, fiscal_year_events_path(fy) %>
+  </li>
+  <% end %>
+</ul>

@@ -75,8 +75,7 @@ Event.addBehavior({
   },
   '.event_lines li input[type=text]:blur' : function(e) {
     fillEmpty();
-  },
-  'input.date' : DateSelector
+  }
 });
 
 function fillEmpty() {

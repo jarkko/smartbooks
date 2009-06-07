@@ -1,4 +1,8 @@
 class FiscalYearsController < ApplicationController
+  def index
+    @fiscal_years = FiscalYear.find(:all)
+  end
+  
   # GET /fiscal_years/new
   def new
     @fiscal_year = FiscalYear.new

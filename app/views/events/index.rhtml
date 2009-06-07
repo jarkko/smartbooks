@@ -3,6 +3,17 @@
 <% end %>
 <h1>Listing events</h1>
 
+<ul>
+  <li>
+    <%= link_to "Balance Sheet", fiscal_year_balance_sheet_path(@fiscal_year) %>
+  </li>
+
+  <li>
+    <%= link_to "Income Statement", fiscal_year_income_statement_path(@fiscal_year) %>
+  </li>
+
+</ul>
+
 <p>
   <%= link_to "Add new event", new_fiscal_year_event_path(@fiscal_year), :accesskey => "n" %>
 </p>

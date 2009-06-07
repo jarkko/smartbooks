@@ -1,6 +1,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe FiscalYearsController do
+  before(:all) do
+    @fiscal_years = [mock_fiscal_year, mock_fiscal_year]
+  end
+  
   describe "#route_for" do
     it "should map { :controller => 'fiscal_years', :action => 'index' } to /fiscal_years" do
       route_for(:controller => "fiscal_years", :action => "index").should == "/fiscal_years"
@@ -31,7 +35,6 @@ describe FiscalYearsController do
     before(:each) do
       @fiscal_year = mock_fiscal_year
       FiscalYear.stub!(:new).and_return(@fiscal_year)
-      @fiscal_years = [mock_fiscal_year, mock_fiscal_year]
       FiscalYear.stub!(:find).with(:all).and_return(@fiscal_years)
       
       get :new
@@ -42,6 +45,22 @@ describe FiscalYearsController do
     end
     
     it "should assign other fiscal years for the dropdown" do
+      assigns[:fiscal_years].should == @fiscal_years
+    end
+  end
+  
+  describe "GET index" do
+    before(:each) do
+      FiscalYear.should_receive(:find).with(:all).and_return(@fiscal_years)
+      get :index
+    end
+        
+    it "should be successful" do
+      response.should be_success
+      response.should render_template('fiscal_years/index')
+    end
+    
+    it "should fetch all fiscal years" do
       assigns[:fiscal_years].should == @fiscal_years
     end
   end
