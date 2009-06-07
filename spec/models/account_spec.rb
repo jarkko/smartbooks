@@ -149,11 +149,10 @@ describe Account do
                               end)
       end
       
-      @account.children << @a
-      @a.children << @a1
-      @a1.children << @a1a
-      @account.children << @b
-      @b.children.concat([@b1, @b2])
+      @account.should_receive(:children).twice.and_return([@a, @b])
+      @a.should_receive(:children).twice.and_return([@a1])
+      @a1.should_receive(:children).twice.and_return([@a1a])
+      @b.should_receive(:children).twice.and_return([@b1, @b2])
     end
     
     it "should return the whole stack of children recursively" do

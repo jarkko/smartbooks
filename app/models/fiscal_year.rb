@@ -181,12 +181,15 @@ class FiscalYear < ActiveRecord::Base
   
   def copy_balance_from(source_year)
     source = FiscalYear.find(source_year)
+    logger.debug("*** copying balance from #{source.inspect}")
     balance_accounts = accounts.select do |acc|
       %w(Vastaavaa Vastattavaa).include?(acc.title)
     end
-        
+    logger.debug("*** balance_accounts: #{balance_accounts.map{|a| a.title}.inspect}")
     balance_accounts.each do |account|
-      account.all_children.each do |child|
+      logger.debug("*** all children of #{account.title}: #{account.all_children.map{|a| a.title}.inspect}")
+      
+      account.all_children.each do |child|        
         original = source.accounts.detect do |acc|
           acc.account_number == child.account_number &&
           acc.description == child.description
@@ -201,5 +204,9 @@ class FiscalYear < ActiveRecord::Base
         child.open_account_from(original)
       end
     end
+  end
+  
+  def balance_accounts
+    
   end
 end

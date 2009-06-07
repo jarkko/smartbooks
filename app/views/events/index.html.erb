@@ -18,7 +18,7 @@
   <%= link_to "Add new event", new_fiscal_year_event_path(@fiscal_year), :accesskey => "n" %>
 </p>
 
-<% form_tag({}, :method => 'get') do %>
+<% form_tag(fiscal_year_events_path(@fiscal_year), :method => 'get') do %>
 <p>
   Limit the time frame: <%= text_field_tag "start_date", params[:start_date], :class => 'date' %> to <%= text_field_tag "end_date", params[:end_date], :class => 'date' %>
   <%= submit_tag "Limit" %>

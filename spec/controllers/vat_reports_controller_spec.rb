@@ -22,7 +22,7 @@ describe VatReportsController do
     
     it "should not populate debt" do
       get_new
-      assigns[:debt].should be_nil
+      assigns[:debt].should == nil
     end
     
     describe "when month param set" do

@@ -7,7 +7,7 @@ require 'spec/rails'
 
 module FiscalYearSpecHelper
   def mock_fiscal_year
-    fiscal_year = mock_model(FiscalYear,
+    fiscal_year = stub_model(FiscalYear,
                              :net_income_before_taxes => 7500000,
                              :net_operating_income => 7400000,
                              :net_income => 6900000,
@@ -26,6 +26,7 @@ module FiscalYearSpecHelper
                            :result => amount,
                            :total => amount) do |acc|
         acc.title = name
+        acc.account_number = rand(10000000).to_s
       end
       
       instance_variable_set("@#{key}", account)

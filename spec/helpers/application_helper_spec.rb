@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe ApplicationHelper do
+  include ApplicationHelper
+  
   describe "month_select_tag" do
     it "should show a list of months" do
       month_select_tag.should ==

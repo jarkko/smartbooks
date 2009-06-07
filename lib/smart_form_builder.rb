@@ -174,11 +174,11 @@ module ActionView
      	#   label_for("post", "title", "Funky Title", :id => "funky") 
      	#     <label for="post_title" id="funky">Funky Title</label> 
      	def label_for(object_name, method, value = nil, options = {}) 
-     	  InstanceTag.new(object_name, method, self, nil, options.delete(:object)).to_label_tag(value, options) 
+     	  InstanceTag.new(object_name, method, self, options.delete(:object)).to_label_tag(value, options) 
      	end
      	
      	def id_for(object_name, method, options = {})
-     	  InstanceTag.new(object_name, method, self, nil, options.delete(:object)).to_id_field(options)
+     	  InstanceTag.new(object_name, method, self, options.delete(:object)).to_id_field(options)
      	end
      	
       #def country_select(name, selected='')

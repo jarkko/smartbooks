@@ -68,12 +68,10 @@ describe FiscalYear do
       describe "and copy_balance set" do
         before(:each) do
           @fiscal_year.copy_balance = "1"
-          @fiscal_year.accounts.stub!(:select).and_return([@assets, @liabilities])
-          @fiscal_year.accounts.stub!(:detect).and_return(:equity)
-          @assets.stub!(:all_children).
-                and_return([@vat_receivables, @current_assets])
-          @liabilities.stub!(:all_children).
-                and_return([@vat_payable, @accounts_payable, @stockholders_equity, @private_equity])
+          #@fiscal_year.assets.should_receive(:all_children).
+          #      and_return([@vat_receivables, @current_assets])
+          #@liabilities.should_receive(:all_children).
+          #      and_return([@vat_payable, @accounts_payable, @stockholders_equity, @private_equity])
           
           @equity = @fiscal_year.equity
           @equity.stub!(:all_children).and_return([@stockholders_equity, @private_equity])      
@@ -83,9 +81,11 @@ describe FiscalYear do
           end
         end
         
-        it "should open the balance sheet accounts with the balance from the previous year" do
+        it "should open the balance sheet accounts with the balance from the previous year" do          
           @children.each do |child|
             original = @fy2.accounts.detect{|acc| acc.account_number == child.account_number}
+            #puts "original: #{[original.title, original.account_number].inspect}"
+            #puts "child: #{[child.title, child.account_number].inspect}"
             child.should_receive(:open_account_from).with(original)
           end
           @fiscal_year.save
