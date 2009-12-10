@@ -195,7 +195,8 @@ class FiscalYear < ActiveRecord::Base
           acc.description == child.description
         end
         
-        next if equity.all_children.include?(child) || 
+        next if original.nil? ||
+                equity.all_children.include?(child) || 
                 child.account_number == "-1" || 
                 original.total == 0
         

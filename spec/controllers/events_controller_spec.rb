@@ -282,4 +282,15 @@ describe EventsController do
       assigns[:accounts].should equal(@fiscal_year.accounts.find_for_dropdown)
     end
   end
+  
+  describe "handling PUT /events/update" do
+    before do
+      
+    end
+    
+    it "should redirect to events page" do
+      do_put
+      response.should redirect_to(fiscal_year_events_path(:fiscal_year_id => @fiscal_year, :anchor => "event_#{@event.id}"))
+    end
+  end
 end
