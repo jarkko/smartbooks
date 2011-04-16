@@ -66,4 +66,20 @@ class EventsController < ApplicationController
 
     render :action => "new"
   end
+
+  def update
+    @event = @fiscal_year.events.find(params[:id])
+    @event.update_attributes!(params[:event])
+    @event.update_lines!(params[:line])
+    flash[:notice] = 'Event was successfully updated.'
+    redirect_to fiscal_year_events_url(:fiscal_year_id => @fiscal_year,
+                            :anchor => "event_#{@event.to_param}")
+    rescue ActiveRecord::RecordInvalid
+      flash[:warning] = 'Saving event failed.'
+      @lines = @event.event_lines
+      2.times { @lines << EventLine.new }
+      @accounts = Account.find_for_dropdown
+
+      render :action => "edit"
+  end
 end

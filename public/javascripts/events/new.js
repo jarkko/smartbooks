@@ -4,28 +4,28 @@ Event.addBehavior({
   },
  //'.account > input' : function(e) {
  //  var id = this.up().id.gsub(/^[a-z_]*([0-9]*$)/, '#{1}');
- //  console.log("my id is " + this.id)
- //  console.log("id is " + id);
+ //  // console.log("my id is " + this.id)
+ //  // console.log("id is " + id);
  //  new Autocompleter.Local(this, $('account_list_' + id), accounts.pluck('title'), 
  //        { fullSearch : true,
  //          afterUpdateElement : function(inputfield, selected) {
  //                   var account = accounts.find(function(acc) {
- //                     console.log("selected: " + selected.inspect());
- //                     console.log("innerHTML: " + selected.collectTextNodes());
+ //                     // console.log("selected: " + selected.inspect());
+ //                     // console.log("innerHTML: " + selected.collectTextNodes());
  //                     return acc['title'] == selected.collectTextNodes();
  //                   });
- //                   console.log('setting selected hidden id to ' + account.id);
+ //                   // console.log('setting selected hidden id to ' + account.id);
  //                   $('line_' + id + '_account_id').value = account.id;
  //                  }
  //          })
  //},
  '.account > select' : function(e) {
    var selected_value = $F(this);
-   console.log("value is " + selected_value);
+   //// console.log("value is " + selected_value);
    
    if (selected_value) {
      var selected_name = this.select('option[selected]').first().collectTextNodes();
-     console.log("selected node is " + selected_name);
+     // console.log("selected node is " + selected_name);
    }
    
    var id = this.id.gsub(/^line\_([0-9]*)\_account\_id$/, '#{1}');
@@ -59,11 +59,11 @@ Event.addBehavior({
          { fullSearch : true,
            afterUpdateElement : function(inputfield, selected) {
                     var account = accounts.find(function(acc) {
-                      console.log("selected: " + selected.inspect());
-                      console.log("innerHTML: " + selected.collectTextNodes());
+                      // console.log("selected: " + selected.inspect());
+                      // console.log("innerHTML: " + selected.collectTextNodes());
                       return acc['title'] == selected.collectTextNodes();
                     });
-                    console.log('setting selected hidden id to ' + account.id);
+                    // console.log('setting selected hidden id to ' + account.id);
                     $('line_' + id + '_account_id').value = account.id;
                    }
            });
@@ -91,8 +91,8 @@ function getSum() {
   var credit_sum = credit_fields.inject(0, calculateSum);
   var debit_sum = debit_fields.inject(0, calculateSum);
   
-  //console.log('Sum of debit fields is' + debit_sum);
-  //console.log('Sum of credit fields is' + credit_sum);
+  //// console.log('Sum of debit fields is' + debit_sum);
+  //// console.log('Sum of credit fields is' + credit_sum);
   
   return debit_fields.inject(0, calculateSum) - 
          credit_fields.inject(0, calculateSum);
@@ -101,7 +101,7 @@ function getSum() {
 function calculateSum(sum, n) {
   var value = $F(n).gsub(',', '.');
   var numeric_value = parseFloat(value) || 0;
-  //console.log('Value is ' + numeric_value);
+  //// console.log('Value is ' + numeric_value);
   return sum + numeric_value * 100;
 }
 
@@ -110,11 +110,11 @@ function fillFirstEmptyLine(value) {
   if (line) {
     // input the value to the correct field
     // line.select('input').first().value = "Boo"
-    console.log("Value is " + value);
+    // console.log("Value is " + value);
     if (value != 0)
       fillValue(line, value);
   } else {
-    console.log('No empty line found!')
+    // console.log('No empty line found!')
   }
 }
 
@@ -128,6 +128,6 @@ function findFirstEmptyLine() {
 
 function fillValue(line, value) {
   var field_name = value < 0 ? 'debit' : 'credit';
-  console.log('Filling in ' + field_name + ' with ' + (value / 100) + '.');
+  //// console.log('Filling in ' + field_name + ' with ' + (value / 100) + '.');
   line.select('.' + field_name + ' input').first().value = value.abs() / 100;
 }

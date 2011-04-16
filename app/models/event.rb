@@ -40,6 +40,19 @@ class Event < ActiveRecord::Base
   def self.next_receipt_number
     (maximum('receipt_number') + 1) || 1
   end
+
+  def update_lines!(lines)
+    transaction do
+      event_lines.delete_all
+      lines = lines.respond_to?(:values) ? lines.values : lines
+      lines.each do |line|
+        line.stringify_keys!
+        next if %w(credit debit amount).all? { |i| line[i].blank? }
+        event_lines.build(line)
+      end
+      save!
+    end
+  end
   
   private
   
