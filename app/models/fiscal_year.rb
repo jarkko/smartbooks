@@ -88,7 +88,7 @@ class FiscalYear < ActiveRecord::Base
   end
   
   def liabilities_result
-    stockholders_equity.result.abs +
+    -1 * stockholders_equity.result +
     private_equity_result +
     net_income +
     current_liabilities.result.abs

@@ -82,7 +82,7 @@
   <table>
     <tr>
       <td>Oma pääoma (tilinavaus)</td>
-      <td><%= formatted(@fiscal_year.stockholders_equity.result.abs) %></td>
+      <td><%= formatted(-1 * @fiscal_year.stockholders_equity.result) %></td>
     </tr>
     
     <tr>
