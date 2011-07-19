@@ -2,7 +2,7 @@ require "sexp"
 
 class SexpParser
   def initialize(str)
-    @sexp_array = str.parse_sexp
+    @sexp_array = str.parse_sexp[0]
   end
   
   def import

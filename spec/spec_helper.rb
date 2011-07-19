@@ -1,7 +1,7 @@
 # This file is copied to ~/spec when you run 'ruby script/generate rspec'
 # from the project root directory.
 ENV["RAILS_ENV"] ||= 'test'
-require File.dirname(__FILE__) + "/../config/environment" unless defined?(RAILS_ROOT)
+require File.expand_path(File.join(File.dirname(__FILE__),'..','config','environment'))
 require 'spec/autorun'
 require 'spec/rails'
 
@@ -78,6 +78,8 @@ module FiscalYearSpecHelper
   end
 end
 
+Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -133,6 +135,10 @@ module EventsControllerSpecHelper
   
   def do_post(params = {})
     post :create, valid_attributes.except(:fiscal_year_id).merge(params)
+  end
+  
+  def do_put(params = {})
+    put :update, valid_attributes.merge(:id => @event.id).merge(params)
   end
 
   def event_lines

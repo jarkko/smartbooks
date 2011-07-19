@@ -44,6 +44,8 @@ Rails::Initializer.run do |config|
   # config.active_record.default_timezone = :utc
   
   # See Rails::Configuration for more options
+  config.gem "sexp", :version => "~>0.2.1", :require  => "sexp"
+  
 end
 
 # Add new inflection rules using the following format 
@@ -73,5 +75,3 @@ MONTHS = [["Tammikuu", "1"],
           ["Marraskuu", "11"],
           ["Joulukuu", "12"]
         ]
-        
-gem "sexp"

@@ -55,7 +55,7 @@ describe "/balance_sheets/show" do
                           formatted(@fiscal_year.assets.result.abs))    
     end
 
-    [:stockholders_equity, :cash_private_investments,
+    [:cash_private_investments,
      :other_private_investments,
      :vat_debt, :vat_payable, :accounts_payable].each do |account|
       it "should show #{account.to_s.humanize}" do
@@ -63,6 +63,13 @@ describe "/balance_sheets/show" do
           with_tag "td", @fiscal_year.send(account).title
           with_tag "td", formatted(@fiscal_year.send(account).result.abs)
         end
+      end
+    end
+    
+    it "should show stockholder's equity times -1" do
+      response.should have_tag("#liabilities") do
+        with_tag "td", @fiscal_year.stockholders_equity.title
+        with_tag "td", formatted(-1 * @fiscal_year.stockholders_equity.result)
       end
     end
 

@@ -9,12 +9,12 @@ module SampleData
      version "versio 0.10"
      finances (fiscal-year "Esimerkkiyhdistys ery"
                            (date 2003 1 1)
-    		       (date 2003 12 31)
-    		       (account-map (account -1 "Vastaavaa" ((account 101 "Pankkitili")))
-    		                    (account -1 "Vastattavaa" ((account 201 "Oma pääoma")))
-    				    (account -1 "Tulos" ((account 300 "Tulot") (account 400 "Menot"
-    				                                                  ((account 401 "Ostot"))))))
-    		       ((event 1 (date 2003 1 1) "Tilinavaus" ((101 (money 123456)) (201 (money -123456)))))))
+               (date 2003 12 31)
+               (account-map (account -1 "Vastaavaa" ((account 101 "Pankkitili")))
+                            (account -1 "Vastattavaa" ((account 201 "Oma pääoma")))
+                (account -1 "Tulos" ((account 300 "Tulot") (account 400 "Menot"
+                                                              ((account 401 "Ostot"))))))
+               ((event 1 (date 2003 1 1) "Tilinavaus" ((101 (money 123456)) (201 (money -123456)))))))
     END
   end
 end
@@ -55,7 +55,7 @@ describe SexpParser, ", creating new fiscal year" do
     FiscalYear.stub!(:create!).and_return(@fy)
     @fy.stub!(:create_account_from_array)
     
-    @accounts = sample.parse_sexp[5][4][1..-1]
+    @accounts = sample.parse_sexp[0][5][4][1..-1]
   end
   
   #it "should create new fiscal year with correct start date" do
@@ -103,7 +103,7 @@ describe FiscalYear, "create_account_from_array" do
   include SampleData
   
   before(:each) do
-    @accounts = sample.parse_sexp[5][4][3]
+    @accounts = sample.parse_sexp[0][5][4][3]
     @fy = stub_model(FiscalYear)
     
     @sample_accounts = 
@@ -129,7 +129,7 @@ describe Event, "calling parse_events" do
   include SampleData
   
   before(:each) do
-    @events = sample.parse_sexp[5][5]
+    @events = sample.parse_sexp[0][5][5]
     Event.stub!(:parse_event)
     @fy = mock_model(FiscalYear)
   end
@@ -146,7 +146,7 @@ describe Event, "calling parse_event" do
   
   before(:each) do
     @fy = fiscal_years(:year2007)
-    @events = sample.parse_sexp[5][5]
+    @events = sample.parse_sexp[0][5][5]
   end
   
   it "should save event" do

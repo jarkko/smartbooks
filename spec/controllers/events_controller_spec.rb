@@ -225,22 +225,29 @@ describe EventsController do
     end   
   end
 
+  def prepare_for_edit
+    @event = Factory.build(:event, :id => 69)
+    Event.stub!(:find).with("69").and_return(@event)
+    @event_lines = []
+
+    amt = rand(100)
+    2.times do |i|
+      factor = -1 ** i
+      event_line = Factory.build(:event_line, :amount => amt * factor)
+      @event_lines << event_line
+    end
+    @event.stub!(:event_lines).and_return(@event_lines)
+    
+    @fiscal_year = stub_model(FiscalYear, :accounts => [])
+    @fiscal_year.stub!(:events).and_return([])
+    @fiscal_year.events.stub!(:find).and_return(@event)
+    @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(:accounts)
+    FiscalYear.stub!(:find).and_return(@fiscal_year)
+  end
+
   describe "handling GET /events/edit" do
     before do
-      @event = Factory.build(:event)
-      Event.stub!(:find).with("69").and_return(@event)
-      @event_lines = []
-      2.times do
-        event_line = Factory.build(:event_line)
-        @event_lines << event_line
-      end
-      @event.stub!(:event_lines).and_return(@event_lines)
-      
-      @fiscal_year = stub_model(FiscalYear, :accounts => [])
-      @fiscal_year.stub!(:events).and_return([])
-      @fiscal_year.events.stub!(:find).and_return(@event)
-      @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(:accounts)
-      FiscalYear.stub!(:find).and_return(@fiscal_year)
+      prepare_for_edit
     end
 
     def do_get
@@ -285,10 +292,13 @@ describe EventsController do
   
   describe "handling PUT /events/update" do
     before do
-      
+      prepare_for_edit
     end
     
     it "should redirect to events page" do
+      @event.should_receive(:update_attributes!).
+                      with(valid_attributes[:event].stringify_keys)
+      @event.should_receive(:update_lines!).with(valid_attributes[:line])
       do_put
       response.should redirect_to(fiscal_year_events_path(:fiscal_year_id => @fiscal_year, :anchor => "event_#{@event.id}"))
     end
