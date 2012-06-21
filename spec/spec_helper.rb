@@ -1,9 +1,11 @@
-# This file is copied to ~/spec when you run 'ruby script/generate rspec'
-# from the project root directory.
+# -*- encoding : utf-8 -*-
+# This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
-require File.expand_path(File.join(File.dirname(__FILE__),'..','config','environment'))
-require 'spec/autorun'
-require 'spec/rails'
+require File.expand_path("../../config/environment", __FILE__)
+require 'rspec/rails'
+require 'rspec/autorun'
+
+Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
 module FiscalYearSpecHelper
   def mock_fiscal_year
@@ -17,9 +19,9 @@ module FiscalYearSpecHelper
                              :to_param => "69",
                              :copy_accounts_from => nil,
                              :copy_balance => nil)
-                             
+
     fiscal_year.stub!(:accounts).and_return([])
-    
+
     FiscalYear.account_names.each do |key, name|
       amount = (((-1) ** rand(2)) * rand(100000))
       account = stub_model(Account,
@@ -28,7 +30,7 @@ module FiscalYearSpecHelper
         acc.title = name
         acc.account_number = rand(10000000).to_s
       end
-      
+
       instance_variable_set("@#{key}", account)
       fiscal_year.accounts << account
       fiscal_year.stub!(key).and_return(instance_variable_get("@#{key}"))
@@ -41,10 +43,10 @@ module FiscalYearSpecHelper
       stub_model(Account, :result => -15000) do |acc|
         acc.title = "Myynti 0%"
       end
-    ]  
+    ]
     @sales.stub!(:children).and_return(@subaccounts)
     fiscal_year.accounts.concat(@subaccounts)
-    
+
     @bank_accounts.stub!(:children).and_return(
       [
         stub_model(Account, :result => 30000) do |acc|
@@ -57,36 +59,36 @@ module FiscalYearSpecHelper
         end
       ])
     fiscal_year.accounts.concat(@bank_accounts.children)
-    
-    
+
+
     @total_income = @sales.result + @interest_income.result
-    fiscal_year.stub!(:total_income).and_return(@total_income)  
+    fiscal_year.stub!(:total_income).and_return(@total_income)
 
     @total_expenses = @purchases.result +
                       @services.result +
                       @depreciation.result +
                       @other_expenses.result +
                       @interest_expenses.result
-                      
+
     fiscal_year.stub!(:total_expenses).and_return(@total_expenses)
     fiscal_year.stub!(:liabilities_result).and_return(6900000)
     fiscal_year.stub!(:private_equity_result).and_return(-1 * @private_equity.result)
-    
+
     fiscal_year.errors.stub!(:on).and_return([])
-    
+
     fiscal_year
   end
 end
 
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+  config.fixture_path = Rails.root + '/spec/fixtures/'
 
   # == Fixtures
   #
@@ -105,56 +107,55 @@ Spec::Runner.configure do |config|
   #
   # You can also declare which fixtures to use (for example fixtures for test/fixtures):
   #
-  # config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+  # config.fixture_path = Rails.root + '/spec/fixtures/'
   #
   # == Mock Framework
   #
   # RSpec uses it's own mocking framework by default. If you prefer to
   # use mocha, flexmock or RR, uncomment the appropriate line:
   #
-  
+
   config.include(FiscalYearSpecHelper)
-  
+
   # config.mock_with :mocha
   # config.mock_with :flexmock
   # config.mock_with :rr
   #
   # == Notes
-  # 
+  #
   # For more information take a look at Spec::Runner::Configuration and Spec::Runner
 end
 
 module EventsControllerSpecHelper
   def valid_attributes
-    {:fiscal_year_id => 1, 
+    {:fiscal_year_id => 1,
      :line => event_lines,
      :event => {:receipt_number => "", :description => "yrittäjäeläkemaksu",
-                "event_date(1i)" => "2007", "event_date(2i)" => "8", 
+                "event_date(1i)" => "2007", "event_date(2i)" => "8",
                 "event_date(3i)" => "27"}}
   end
-  
+
   def do_post(params = {})
     post :create, valid_attributes.except(:fiscal_year_id).merge(params)
   end
-  
+
   def do_put(params = {})
     put :update, valid_attributes.merge(:id => @event.id).merge(params)
   end
 
   def event_lines
-    {"1" => {"debit" => "", "account_id" => "380", "credit" => "60"}, 
-    "2" => {"debit" => "50", "account_id" => "398", "credit" => ""}, 
-    "3" => {"debit" => "10", "account_id" => "359", "credit" => ""}, 
+    {"1" => {"debit" => "", "account_id" => "380", "credit" => "60"},
+    "2" => {"debit" => "50", "account_id" => "398", "credit" => ""},
+    "3" => {"debit" => "10", "account_id" => "359", "credit" => ""},
     "4" => {"debit" => "", "account_id" => "357", "credit" => ""}}
   end
-  
+
   def prepare_events
     @event = mock_model(Event)
     Event.stub!(:find).and_return([@event])
     @fy = mock_model(FiscalYear)
     FiscalYear.stub!(:find).and_return(@fy)
     @events = [@event]
-    @events.stub!(:find).and_return(@events)
-    @fy.stub!(:events).and_return(@events)
+    @fy.stub!(:ordered_events).and_return(@events)
   end
 end

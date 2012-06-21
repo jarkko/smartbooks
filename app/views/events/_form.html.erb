@@ -3,22 +3,23 @@
                     "/fiscal_years/#{@fiscal_year.id}/accounts" %>
 <% end %>
 
-<%= error_messages_for :event %>
+<% if @event.errors.any? %>
+  <ul>
+    <% @event.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
 
-<% form_for([@fiscal_year, @event], :html => {:id => "event_form"}) do |f| %>
-
-<div>
-  <%= hidden_field_tag "form_token", @form_token %>
-</div>
-
+<%= form_for([@fiscal_year, @event], :html => {:id => "event_form"}) do |f| %>
   <p>
     <label for="event_description">Description:</label> <%= f.text_field(:description, :size => 40) %>
   </p>
-  
+
   <p>
     <label for="event_receipt_number">Receipt Number:</label> <%= f.text_field(:receipt_number, :size => 4) %>
   </p>
-  
+
   <p>
     <label for="event_event_date">Date:</label> <%= f.text_field :event_date, :size => 12, :class => "date" %>
   </p>
@@ -34,19 +35,21 @@
         </span>
       </h4>
     </li>
-    
-    <% @lines.each_with_index do |@line, idx| %>
-      <% @line.id = idx + 1 if @line.id.blank? %>
+
+    <% @lines.each_with_index do |line, idx| %>
+      <% line.id = idx + 1 if line.id.blank? %>
       <li>
+      <%= f.fields_for(:event_lines, line) do |f2| %>
         <span class="account">
-          <%= select( "line[]", :account_id, @accounts.map{|a| [a.title, a.id]}, :include_blank => true) %>
+          <%= f2.select(:account_id, @accounts.map{|a| [a.title, a.id]}, :include_blank => true) %>
         </span>
         <span class="debit">
-          <%= text_field "line[]", :debit, :size => 8, :value => trimmed(@line.debit) %>
+          <%= f2.text_field :debit, :size => 8, :value => trimmed(line.debit) %>
         </span>
         <span class="credit">
-          <%= text_field "line[]", :credit, :size => 8, :value => trimmed(@line.credit) %>
+          <%= f2.text_field :credit, :size => 8, :value => trimmed(line.credit) %>
         </span>
+      <% end %>
       </li>
     <% end %>
   </ul>

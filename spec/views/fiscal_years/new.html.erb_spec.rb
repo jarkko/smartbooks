@@ -1,9 +1,10 @@
+# -*- encoding : utf-8 -*-
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe "/fiscal_years/new.html.erb" do
   include FiscalYearsHelper
   include FiscalYearSpecHelper
-  
+
   before do
     @fiscal_year = mock_fiscal_year
     @fiscal_year.stub!(:new_record?).and_return(true)
@@ -12,8 +13,8 @@ describe "/fiscal_years/new.html.erb" do
   end
 
   it "should render new form" do
-    render "/fiscal_years/new"
-    response.should have_tag("form[action=?][method=post]", fiscal_years_path) do
+    render
+    response.should have_selector("form[action=?][method=post]", fiscal_years_path) do
       with_tag "input[type=text][name='fiscal_year[description]']"
       with_tag "input.date[type=text][name='fiscal_year[start_date]']"
       with_tag "input.date[type=text][name='fiscal_year[end_date]']"

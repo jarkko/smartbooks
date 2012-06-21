@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 class CreateFiscalYears < ActiveRecord::Migration
   def self.up
     create_table :fiscal_years do |t|

@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Account do
@@ -12,11 +13,11 @@ end
 
 describe Account, ", calling virtual accounts" do
   fixtures :fiscal_years, :accounts, :events
-  
+
   before(:each) do
     @virtual_accounts = Account.find_virtual
   end
-  
+
   it "should fetch all accounts with number -1 and nothing else" do
     @virtual_accounts.should == [accounts(:vastaavaa),
                                 accounts(:vastattavaa),
@@ -26,17 +27,17 @@ end
 
 describe Account, "calling find_for_dropdown" do
   fixtures :fiscal_years, :accounts, :events
-  
+
   before(:each) do
     @accounts = Account.find_for_dropdown
     @virtual_accounts = Account.find_virtual
-    @all_accounts = Account.find(:all)
+    @all_accounts = Account.all
   end
 
   it "should order alphabetically" do
     @accounts.should == (@all_accounts - @virtual_accounts).sort_by(&:title)
   end
-  
+
   it "should not have virtual accounts" do
     (@accounts & @virtual_accounts).should be_empty
   end
@@ -59,79 +60,92 @@ describe Account do
       @account.fiscal_year = @fiscal_year
       @lines.stub!(:sum).and_return(5600)
     end
-    
+
     describe "without month set" do
       it "should return the sum of all the lines" do
         @account.total.should == 5600
       end
-      
+
       describe "and only option set to debit" do
         it "should only fetch the sum from positive lines" do
-          @lines.should_receive(:sum).with(:amount,
-              :conditions => "amount > 0")
+          @lines.should_receive(:where).with("amount > 0").
+            and_return(@lines)
+          @lines.should_receive(:sum).with(:amount)
           @account.total(:only => :debit)
         end
       end
-      
+
       describe "and only option set to credit" do
         it "should only fetch the sum from negative lines" do
-          @lines.should_receive(:sum).with(:amount,
-              :conditions => "amount < 0")
+          @lines.should_receive(:where).with("amount < 0").
+            and_return(@lines)
+          @lines.should_receive(:sum).with(:amount)
           @account.total(:only => :credit)
         end
       end
-      
+
       describe "when formatted parameter set" do
         it "should return the sum formatted" do
           @account.total(:formatted => true).should == "+56.00"
         end
       end
     end
-    
+
     describe "with month option set" do
       it "should restrict to events within the time frame" do
-        @lines.should_receive(:sum).with(:amount,
-            :joins => "join events on event_lines.event_id = events.id", 
-            :conditions => "event_date between '2007-08-01' and '2007-08-31'").
-                and_return(-6000)
+        @lines.should_receive(:joins).with("join events on event_lines.event_id = events.id").
+          and_return(@lines)
+        @lines.should_receive(:where).with("event_date between '2007-08-01' and '2007-08-31'").
+          and_return(@lines)
+        @lines.should_receive(:sum).with(:amount).and_return(-6000)
         @account.total(:month => "8").should == -6000
       end
     end
-    
+
     describe "with month option set to a range" do
       it "should restrict to events within the time frame" do
-        @lines.should_receive(:sum).with(:amount,
-            :joins => "join events on event_lines.event_id = events.id", 
-            :conditions => "event_date between '2007-01-01' and '2007-10-31'")
+        @lines.should_receive(:joins).with("join events on event_lines.event_id = events.id").
+          and_return(@lines)
+        @lines.should_receive(:where).with("event_date between '2007-01-01' and '2007-10-31'").
+          and_return(@lines)
+        @lines.should_receive(:sum).with(:amount)
         @account.total(:month => 1..10)
       end
-      
+
       describe "and only option set to debit" do
         it "should only fetch the sum from positive lines" do
-          @lines.should_receive(:sum).with(:amount,
-              :joins => "join events on event_lines.event_id = events.id", 
-              :conditions => "event_date between '2007-01-01' and '2007-10-31' and amount > 0")
+          @lines.should_receive(:joins).with("join events on event_lines.event_id = events.id").
+            and_return(@lines)
+          @lines.should_receive(:where).with("event_date between '2007-01-01' and '2007-10-31'").
+            and_return(@lines)
+          @lines.should_receive(:where).with("amount > 0").
+            and_return(@lines)
+          @lines.should_receive(:sum).with(:amount)
           @account.total(:month => 1..10, :only => :debit)
         end
       end
-      
+
       describe "and only option set to credit" do
         it "should only fetch the sum from negative lines" do
-          @lines.should_receive(:sum).with(:amount,
-              :joins => "join events on event_lines.event_id = events.id", 
-              :conditions => "event_date between '2007-01-01' and '2007-10-31' and amount < 0")
+          @lines.should_receive(:joins).with("join events on event_lines.event_id = events.id").
+            and_return(@lines)
+          @lines.should_receive(:where).with("event_date between '2007-01-01' and '2007-10-31'").
+            and_return(@lines)
+          @lines.should_receive(:where).with("amount < 0").
+            and_return(@lines)
+          @lines.should_receive(:sum).with(:amount)
           @account.total(:month => 1..10, :only => :credit)
         end
       end
     end
   end
-  
+
   describe "formatted_total" do
     it "should return the formatted total" do
       @account.should_receive(:total).with(:formatted => true).and_return("+69.00")
       @account.formatted_total.should == "+69.00"
     end
-    
+
     it "should pass options to total" do
       @account.should_receive(:total).with(:month => 1..10,
                                            :formatted => true).
@@ -139,40 +153,40 @@ describe Account do
       @account.formatted_total(:month => 1..10).should == "+66.00"
     end
   end
-  
+
   describe "all_children" do
     before(:each) do
       %w(@a @a1 @a1a @b @b1 @b2).each do |account|
-        instance_variable_set(account, 
+        instance_variable_set(account,
                               stub_model(Account) do |acc|
                                 acc.title = account
                               end)
       end
-      
+
       @account.should_receive(:children).twice.and_return([@a, @b])
       @a.should_receive(:children).twice.and_return([@a1])
       @a1.should_receive(:children).twice.and_return([@a1a])
       @b.should_receive(:children).twice.and_return([@b1, @b2])
     end
-    
+
     it "should return the whole stack of children recursively" do
       @account.all_children.should == [@a, @b, @a1, @a1a, @b1, @b2]
     end
   end
-  
+
   describe "open_account_from" do
     before(:each) do
       @fiscal_year = stub_model(FiscalYear, :stockholders_equity => :stockholders_equity) do |fy|
         fy.start_date = Date.new(2008,1,1)
         fy.end_date = Date.new(2008,12,31)
       end
-      
+
       @account.fiscal_year = @fiscal_year
       @account.title = "Bank account"
-      
+
       @original = stub_model(Account, :total => 45000)
     end
-    
+
     it "should open the account with an opening event copying the total of the corresponding source account" do
       @fiscal_year.should_receive(:create_event).with(
       {:event_date => @fiscal_year.start_date,
@@ -182,7 +196,7 @@ describe Account do
        {:amount => (-1 * @original.total),
         :account => :stockholders_equity}]
       )
-      
+
       @account.open_account_from(@original)
     end
   end

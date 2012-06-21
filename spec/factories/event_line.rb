@@ -1,2 +1,5 @@
-Factory.define :event_line, :default_strategy => :build do |e|
+# -*- encoding : utf-8 -*-
+FactoryGirl.define do
+ factory :event_line do
+ end
 end

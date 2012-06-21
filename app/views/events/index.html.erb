@@ -1,5 +1,5 @@
 <% @page_title = "Events for #{@fiscal_year.description}" %>
-<% content_for :javascript do %>
+<%= content_for :javascript do %>
   <%= javascript_include_tag 'date_selector', 'fiscal_years/index' %>
 <% end %>
 <h1>Listing events</h1>
@@ -19,7 +19,7 @@
   <%= link_to "Add new event", new_fiscal_year_event_path(@fiscal_year), :accesskey => "n" %>
 </p>
 
-<% form_tag(fiscal_year_events_path(@fiscal_year), :method => 'get') do %>
+<%= form_tag(fiscal_year_events_path(@fiscal_year), :method => 'get') do %>
 <p>
   Limit the time frame: <%= text_field_tag "start_date", params[:start_date], :class => 'date' %> to <%= text_field_tag "end_date", params[:end_date], :class => 'date' %>
   <%= submit_tag "Limit" %>
@@ -36,15 +36,15 @@
       <span class="description">
         <%=h event.description %>
       </span>
-      
-      <%= link_to "Edit", edit_fiscal_year_event_path(@fiscal_year, event), :class => "edit_event_link" %>
+
+      <%= link_to "Edit", [:edit, @fiscal_year, event], :class => "edit_event_link" %>
     </h4>
-    
+
     <ul class="event_lines">
       <% for event_line in event.event_lines %>
       <li>
         <span class="event_line_account">
-          <%= link_to event_line.account.title, 
+          <%= link_to event_line.account.title,
                       fiscal_year_account_path(@fiscal_year, event_line.account) %>
         </span>
         <%= colored_sum(event_line.sum) %>

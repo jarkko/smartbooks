@@ -1,8 +1,8 @@
-require "sexp"
+# -*- encoding : utf-8 -*-
 
 class SexpParser
   def initialize(str)
-    @sexp_array = str.parse_sexp[0]
+    @sexp_array = Sexpistol.new.parse_string(str)[0]
   end
   
   def import

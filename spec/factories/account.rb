@@ -1,4 +1,7 @@
-Factory.define :account, :default_strategy => :stub do |a|
-  a.title "Bank account"
-  a.add_attribute(:id, 1)
+# -*- encoding : utf-8 -*-
+FactoryGirl.define do
+  factory :account do
+    title "Bank account"
+    add_attribute(:id, 1)
+  end
 end

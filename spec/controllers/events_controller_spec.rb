@@ -1,10 +1,11 @@
+# -*- encoding : utf-8 -*-
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe EventsController do
   include EventsControllerSpecHelper
-  
+
   describe "handling GET /events" do
-    describe "GET /events general", :shared => true do
+    share_examples_for "GET /events general" do
       it "should be successful" do
         do_get
         response.should be_success
@@ -21,7 +22,7 @@ describe EventsController do
         assigns[:events].should == [@event]
       end
     end
-    
+
     before do
       prepare_events
     end
@@ -33,12 +34,10 @@ describe EventsController do
     it_should_behave_like "GET /events general"
 
     it "should find all events" do
-      @events.should_receive(:find).with(:all, 
-                          :order => "event_date, receipt_number",
-                          :include => {:event_lines => :account}).and_return([@event])
+      @fy.should_receive(:ordered_events).with(nil, nil).and_return([@event])
       do_get
     end
-    
+
     describe "with start_date" do
       def do_get
         get :index, :fiscal_year_id => 1, :start_date => "2007/08/03"
@@ -47,14 +46,11 @@ describe EventsController do
       it_should_behave_like "GET /events general"
 
       it "should find all events" do
-        @events.should_receive(:find).with(:all, 
-                          :order => "event_date, receipt_number",
-                          :conditions => ["event_date >= ?", "2007-08-03"],
-                          :include => {:event_lines => :account}).and_return([@event])
+        @fy.should_receive(:ordered_events).with("2007/08/03", nil).and_return([@event])
         do_get
       end
     end
-    
+
     describe "with end_date" do
       def do_get
         get :index, :fiscal_year_id => 1, :end_date => "2007/08/03"
@@ -63,14 +59,12 @@ describe EventsController do
       it_should_behave_like "GET /events general"
 
       it "should find all events" do
-        @events.should_receive(:find).with(:all, 
-                          :order => "event_date, receipt_number",
-                          :conditions => ["event_date <= ?", "2007-08-03"],
-                          :include => {:event_lines => :account}).and_return([@event])
+        @fy.should_receive(:ordered_events).with(nil, "2007/08/03").and_return([@event])
+
         do_get
       end
     end
-    
+
     describe "with start_date and end_date" do
       def do_get
         get :index, :fiscal_year_id => 1, :end_date => "2007/08/03", :start_date => "2007/08/01"
@@ -79,18 +73,15 @@ describe EventsController do
       it_should_behave_like "GET /events general"
 
       it "should find all events" do
-        @events.should_receive(:find).with(:all, 
-                          :order => "event_date, receipt_number",
-                          :conditions => ["event_date >= ? and event_date <= ?", "2007-08-01", "2007-08-03"],
-                          :include => {:event_lines => :account}).and_return([@event])
+        @fy.should_receive(:ordered_events).with("2007/08/01", "2007/08/03").and_return([@event])
         do_get
       end
     end
   end
-  
+
   describe "handling GET /events/new" do
     before do
-      @event = Factory.build(:event)
+      @event = FactoryGirl.build_stubbed(:event)
       Event.stub!(:new).and_return(@event)
       @fiscal_year = stub_model(FiscalYear, :accounts => [])
       @fiscal_year.accounts.stub!(:find_for_dropdown).and_return(:accounts)
@@ -136,14 +127,14 @@ describe EventsController do
       assigns[:accounts].should equal(@fiscal_year.accounts.find_for_dropdown)
     end
   end
-  
+
   describe "handling POST /events" do
     before(:each) do
-      @fy = Factory.stub(:fiscal_year, :id => 6)
-      @event = Factory(:event, :id => "69")
+      @fy = FactoryGirl.build_stubbed(:fiscal_year, :id => 6)
+      @event = FactoryGirl.build_stubbed(:event, :id => "69")
       @fy.stub!(:create_event).and_return(@event)
     end
-    
+
     describe "when fiscal year not found" do
       before(:each) do
         @event = mock_model(Event)
@@ -166,7 +157,7 @@ describe EventsController do
         response.response_code.should == 404
       end
     end
-    
+
     describe "successfully" do
       before(:each) do
         FiscalYear.should_receive(:find).and_return(@fy)
@@ -200,7 +191,7 @@ describe EventsController do
         @a1 = mock_model(Account, :title => "foo", :id => 1)
         @a2 = mock_model(Account, :title => "bar", :id => 2)
         @accounts = [@a1, @a2]
-        Account.stub!(:find_for_dropdown).and_return(@accounts)      
+        Account.stub!(:find_for_dropdown).and_return(@accounts)
       end
 
       it "should show the form again" do
@@ -222,22 +213,22 @@ describe EventsController do
         do_post(:fiscal_year_id => @fy.id)
         assigns[:accounts].should == @accounts
       end
-    end   
+    end
   end
 
   def prepare_for_edit
-    @event = Factory.build(:event, :id => 69)
+    @event = FactoryGirl.build_stubbed(:event, :id => 69)
     Event.stub!(:find).with("69").and_return(@event)
     @event_lines = []
 
     amt = rand(100)
     2.times do |i|
       factor = -1 ** i
-      event_line = Factory.build(:event_line, :amount => amt * factor)
+      event_line = FactoryGirl.build_stubbed(:event_line, :amount => amt * factor)
       @event_lines << event_line
     end
     @event.stub!(:event_lines).and_return(@event_lines)
-    
+
     @fiscal_year = stub_model(FiscalYear, :accounts => [])
     @fiscal_year.stub!(:events).and_return([])
     @fiscal_year.events.stub!(:find).and_return(@event)
@@ -289,12 +280,12 @@ describe EventsController do
       assigns[:accounts].should equal(@fiscal_year.accounts.find_for_dropdown)
     end
   end
-  
+
   describe "handling PUT /events/update" do
     before do
       prepare_for_edit
     end
-    
+
     it "should redirect to events page" do
       @event.should_receive(:update_attributes!).
                       with(valid_attributes[:event].stringify_keys)

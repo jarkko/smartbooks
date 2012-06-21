@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 steps_for(:fiscal_year) do
   Given "an empty database" do
     [EventLine, Account, Event, FiscalYear].each do |klass|

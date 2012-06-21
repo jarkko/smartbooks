@@ -1,9 +1,13 @@
 <h1>New fiscal_year</h1>
+<% if @fiscal_year.errors.any? %>
+  <ul>
+    <% @fiscal_year.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
 
-<%= error_messages_for :fiscal_year %>
-
-<% form_for(:fiscal_year, @fiscal_year, :url => fiscal_years_path,
-            :builder => SmartFormBuilder) do |f| %>
+<% form_for(@fiscal_year) do |f| %>
   <%= f.text_field "description" %>
 
   <%= f.text_field 'start_date', :class => "date" %>

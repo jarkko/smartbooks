@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 class VatReportsController < ApplicationController
   def new
     @fiscal_year = FiscalYear.find(params[:fiscal_year_id])

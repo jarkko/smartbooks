@@ -1,12 +1,13 @@
+# -*- encoding : utf-8 -*-
 class FiscalYearsController < ApplicationController
   def index
-    @fiscal_years = FiscalYear.find(:all)
+    @fiscal_years = FiscalYear.all
   end
-  
+
   # GET /fiscal_years/new
   def new
     @fiscal_year = FiscalYear.new
-    @fiscal_years = FiscalYear.find(:all)
+    @fiscal_years = FiscalYear.all
   end
 
   ## GET /fiscal_years/1;edit
