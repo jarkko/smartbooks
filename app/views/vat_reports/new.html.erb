@@ -3,7 +3,7 @@
 </h1>
 
 <p>
-  <% form_tag(new_fiscal_year_vat_report_path(@fiscal_year),
+  <%= form_tag(new_fiscal_year_vat_report_path(@fiscal_year),
               :method => :get) do %>
     <%= month_select_tag(params[:month]) %>
     <%= submit_tag "Valitse" %>
