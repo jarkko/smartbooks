@@ -9,6 +9,10 @@ class FiscalYearsController < ApplicationController
     @fiscal_year = FiscalYear.new
     @fiscal_years = FiscalYear.all
   end
+  
+  def show
+    redirect_to fiscal_year_events_path(params[:id])
+  end
 
   ## GET /fiscal_years/1;edit
   #def edit

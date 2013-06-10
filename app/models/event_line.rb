@@ -51,6 +51,7 @@ class EventLine < ActiveRecord::Base
     end
 
     def get_amount
+      return amount if @deb.nil? && @cred.nil?
       @deb.to_f.round - @cred.to_f.round
     end
 end

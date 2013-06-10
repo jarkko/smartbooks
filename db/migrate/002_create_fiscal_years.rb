@@ -2,12 +2,12 @@
 class CreateFiscalYears < ActiveRecord::Migration
   def self.up
     create_table :fiscal_years do |t|
-      text        :description
-      date        :start_date
-      date        :end_date
-      integer     :company_id
+      t.text        :description
+      t.date        :start_date
+      t.date        :end_date
+      t.integer     :company_id
       
-      timestamps!
+      t.timestamps
     end
     
     add_index :fiscal_years, :start_date

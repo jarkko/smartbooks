@@ -7,7 +7,7 @@
   </ul>
 <% end %>
 
-<% form_for(@fiscal_year) do |f| %>
+<%= form_for(@fiscal_year) do |f| %>
   <%= f.text_field "description" %>
 
   <%= f.text_field 'start_date', :class => "date" %>

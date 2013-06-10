@@ -1,0 +1,28 @@
+<header class="row">
+  <h1>Preliminary events for <%= @account.title %></h1>
+</header>
+
+<% if @preliminary_events.empty? %>
+  <div data-alert class="alert-box">
+    No events found
+    <a href="#" class="close">&times;</a>
+  </div>
+<% end %>
+
+<% @preliminary_events.each do |e| %>
+  <div class="row">
+    <div class="small-2 columns">
+      <%= e.booking_date.to_s %>
+    </div>
+    <div class="small-6 columns">
+      <%= e.description %>
+    </div>
+    <div class="small-2 columns">
+      <%= e.amount %>
+    </div>
+    <%= link_to %[<i class="foundicon-down-arrow"></i>].html_safe, new_fiscal_year_event_path(@fiscal_year, :preliminary_event_id => e.id) %>
+    <a class="small-1 columns" href>
+      
+    </a>
+  </div>
+<% end %>

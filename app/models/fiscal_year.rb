@@ -5,8 +5,9 @@ class FiscalYear < ActiveRecord::Base
 
   validates_presence_of :start_date, :end_date, :description
 
-  has_many :accounts
-  has_many :events
+  has_many :accounts, :dependent => :destroy
+  has_many :events, :dependent => :destroy
+  has_many :preliminary_events, :dependent => :destroy
 
   before_create :copy_accounts_if_needed
   after_create :copy_balance_if_needed
@@ -107,9 +108,11 @@ class FiscalYear < ActiveRecord::Base
     event = events.build(event_hsh)
     lines = lines_hsh.respond_to?(:values) ? lines_hsh.values : lines_hsh
     lines.each do |line|
+      logger.debug("*** Adding line #{line.inspect} for event #{event.inspect}")
       line.stringify_keys!
       next if %w(credit debit amount).all? { |i| line[i].blank? }
       el = event.event_lines.build(line)
+      logger.debug("*** Added line #{el.inspect} for event #{event.inspect}")
     end
 
     event

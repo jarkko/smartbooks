@@ -2,9 +2,11 @@
 class CreateEventLines < ActiveRecord::Migration
   def self.up
     create_table :event_lines do |t|
-      foreign_key		:event, :ref => true
-      foreign_key		:account, :ref => true
-      decimal				:amount
+      t.integer         :event_id
+      t.foreign_key     :events
+      t.integer         :account_id
+      t.foreign_key     :accounts
+      t.decimal 				:amount
     end
   end
 

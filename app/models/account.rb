@@ -3,6 +3,7 @@ class Account < ActiveRecord::Base
   include ActsAsTree
   acts_as_tree :order => "account_number"
   has_many :event_lines, :dependent => :destroy
+  has_many :preliminary_events, :dependent => :nullify
   belongs_to :fiscal_year
 
   def self.find_virtual

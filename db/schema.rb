@@ -1,4 +1,4 @@
-# -*- encoding : utf-8 -*-
+# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120601073829) do
+ActiveRecord::Schema.define(:version => 20130409143127) do
 
   create_table "accounts", :force => true do |t|
     t.string   "title"
@@ -62,10 +62,10 @@ ActiveRecord::Schema.define(:version => 20120601073829) do
   add_index "fiscal_years", ["start_date"], :name => "index_fiscal_years_on_start_date"
 
   create_table "preliminary_events", :force => true do |t|
-    t.integer  "account_id",                         :null => false
-    t.integer  "fiscal_year_id",                     :null => false
-    t.integer  "amount",          :default => 0,     :null => false
-    t.date     "booking_date",                       :null => false
+    t.integer  "account_id",                     :null => false
+    t.integer  "fiscal_year_id",                 :null => false
+    t.integer  "amount_cents",    :default => 0, :null => false
+    t.date     "booking_date",                   :null => false
     t.date     "value_date"
     t.date     "payment_date"
     t.string   "counterpart"
@@ -77,12 +77,13 @@ ActiveRecord::Schema.define(:version => 20120601073829) do
     t.text     "message"
     t.string   "card_number"
     t.text     "receipt"
-    t.boolean  "booked",          :default => false, :null => false
-    t.datetime "created_at",                         :null => false
-    t.datetime "updated_at",                         :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.integer  "event_id"
   end
 
   add_index "preliminary_events", ["account_id", "booking_date"], :name => "index_preliminary_events_on_account_id_and_booking_date"
+  add_index "preliminary_events", ["event_id"], :name => "index_preliminary_events_on_event_id"
   add_index "preliminary_events", ["fiscal_year_id", "booking_date"], :name => "index_preliminary_events_on_fiscal_year_id_and_booking_date"
 
   create_table "sessions", :force => true do |t|
@@ -93,5 +94,12 @@ ActiveRecord::Schema.define(:version => 20120601073829) do
 
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
+
+  add_foreign_key "accounts", "fiscal_years", :name => "accounts_fiscal_year_id_fk"
+
+  add_foreign_key "event_lines", "accounts", :name => "event_lines_account_id_fk"
+  add_foreign_key "event_lines", "events", :name => "event_lines_event_id_fk"
+
+  add_foreign_key "events", "fiscal_years", :name => "events_fiscal_year_id_fk"
 
 end

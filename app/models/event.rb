@@ -5,6 +5,7 @@ class Event < ActiveRecord::Base
   has_many    :event_lines, :dependent => :delete_all
   belongs_to  :fiscal_year
   accepts_nested_attributes_for :event_lines
+  has_one :preliminary_event
 
   validates_presence_of :event_date
 
@@ -54,6 +55,14 @@ class Event < ActiveRecord::Base
       end
       save!
     end
+  end
+  
+  def preliminary_event_id=(id)
+    preliminary_event = fiscal_year.preliminary_events.where(:id => id).first
+  end
+
+  def preliminary_event_id
+    (p = preliminary_event) ? p.id : nil
   end
 
   private

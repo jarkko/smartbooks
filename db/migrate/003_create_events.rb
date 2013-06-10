@@ -2,12 +2,13 @@
 class CreateEvents < ActiveRecord::Migration
   def self.up
     create_table :events do |t|
-      foreign_key     :fiscal_year, :ref => true
-      integer         :receipt_number
-      date            :event_date
-      text            :description
+      t.integer         :fiscal_year_id
+      t.foreign_key     :fiscal_years
+      t.integer         :receipt_number
+      t.date            :event_date
+      t.text            :description
       
-      timestamps!
+      t.timestamps
     end
     
     add_index :events, :event_date

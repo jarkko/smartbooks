@@ -19,7 +19,6 @@
 	text-align: right;
 	}
 
-.event_lines li { width: 70%; }
 .positive { color: green; }
 .negative { color: red; }
 
@@ -48,13 +47,11 @@
 #events { list-style: none; }
 
 #event_form li h4 {
-	margin: 0;
-	margin-left: 20em;
-	}
+	overflow: hidden;
+}
 
 #event_form .account {
-	width: 20em;
-	float: left;
+
 	}
 
 #event_form .account select { width: 20em; }
@@ -63,6 +60,7 @@
   background-color: #ddd;
   border: 1px solid #666;
   overflow: hidden;
+  z-index: 999;
 }
 
 #event_form .account_list ul {
@@ -83,9 +81,7 @@
 }
 
 .debit {
-	width: 5em;
-	float: left;
-	}
+}
 	
 	/* Date Picker */
   table.calendar {

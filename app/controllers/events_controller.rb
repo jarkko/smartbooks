@@ -25,6 +25,8 @@ class EventsController < ApplicationController
     @event = Event.new
     @accounts = @fiscal_year.accounts.find_for_dropdown
     @lines = []
+    fetch_preliminary_data
+
     4.times { @lines << EventLine.new }
   end
 
@@ -77,5 +79,21 @@ class EventsController < ApplicationController
     def cleaned_up_event_params(params)
       params[:event_lines_attributes].reject!{|k,v| (v[:debit].blank? && v[:credit].blank?) || v[:debit] == v[:credit] }
       params
+    end
+
+    def fetch_preliminary_data
+      if params[:preliminary_event_id].present?
+        @preliminary_event = @fiscal_year.preliminary_events.where(:id => params[:preliminary_event_id]).first
+
+        if @preliminary_event
+          @event.description = @preliminary_event.description
+          @event.event_date = @preliminary_event.booking_date
+          @event.receipt_number = @preliminary_event.reference
+          @lines << EventLine.new do |el|
+            el.account = @preliminary_event.account
+            el.amount = @preliminary_event.amount_cents
+          end
+        end
+      end
     end
 end

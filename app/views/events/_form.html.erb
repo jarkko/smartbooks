@@ -25,12 +25,12 @@
   </p>
 
   <ul class="event_lines">
-    <li>
+    <li class="row">
       <h4>
-        <span class="debit">
+        <span class="small-3 columns small-offset-6">
           Debit
         </span>
-        <span class="credit">
+        <span class="small-3 columns">
           Credit
         </span>
       </h4>
@@ -38,15 +38,15 @@
 
     <% @lines.each_with_index do |line, idx| %>
       <% line.id = idx + 1 if line.id.blank? %>
-      <li>
+      <li class="row">
       <%= f.fields_for(:event_lines, line) do |f2| %>
-        <span class="account">
+        <span class="account small-6 columns">
           <%= f2.select(:account_id, @accounts.map{|a| [a.title, a.id]}, :include_blank => true) %>
         </span>
-        <span class="debit">
+        <span class="debit small-3 columns">
           <%= f2.text_field :debit, :size => 8, :value => trimmed(line.debit) %>
         </span>
-        <span class="credit">
+        <span class="credit small-3 columns">
           <%= f2.text_field :credit, :size => 8, :value => trimmed(line.credit) %>
         </span>
       <% end %>
@@ -55,6 +55,9 @@
   </ul>
 
   <p>
+    <% if @preliminary_event %>
+      <%= f.hidden_field :preliminary_event_id, :value => @preliminary_event.id %>
+    <% end %>
     <%= submit_tag @event.new_record? ? "Create" : "Save" %>
   </p>
 <% end %>
