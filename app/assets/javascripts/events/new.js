@@ -74,14 +74,16 @@ Event.addBehavior({
     e.stop();
   },
   '.event_lines li input[type=text]:blur' : function(e) {
-    fillEmpty();
+    console.log(e.element())
+    if (e.element().value == "") return;
+    fillEmpty(e);
   }
 });
 
-function fillEmpty() {
+function fillEmpty(e) {
   var total = getSum();
   //alert('Sum of fields is ' + total);
-  fillFirstEmptyLine(total);
+  fillFirstEmptyLine(total, e);
 }
 
 function getSum() {
@@ -105,8 +107,9 @@ function calculateSum(sum, n) {
   return sum + numeric_value * 100;
 }
 
-function fillFirstEmptyLine(value) {
+function fillFirstEmptyLine(value, event) {
   var line = findFirstEmptyLine();
+
   if (line) {
     // input the value to the correct field
     // line.select('input').first().value = "Boo"
@@ -121,7 +124,8 @@ function fillFirstEmptyLine(value) {
 function findFirstEmptyLine() {
   var line = $$('.event_lines li').detect(function(line) {
     return line.select('.account').size() != 0 &&
-           line.select('.account input, .account select').first().value == ""
+           line.select('.debit input').first().value == "" &&
+           line.select('.credit input').first().value == ""
   });
   return line;
 }
