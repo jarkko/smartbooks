@@ -1,6 +1,7 @@
 # -*- encoding : utf-8 -*-
 class Event < ActiveRecord::Base
   before_create :set_receipt_number
+  mount_uploader :receipt, ReceiptUploader
 
   has_many    :event_lines, :dependent => :delete_all
   belongs_to  :fiscal_year

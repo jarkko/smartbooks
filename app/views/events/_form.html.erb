@@ -55,6 +55,14 @@
   </ul>
 
   <p>
+    <label for="event_receipt">Receipt:</label>
+    <% if @event.receipt? %>
+      <%= link_to @event.receipt.file.filename, @event.receipt_url %><br>
+    <% end %>
+    <%= f.file_field :receipt %>
+  </p>
+
+  <p>
     <% if @preliminary_event %>
       <%= f.hidden_field :preliminary_event_id, :value => @preliminary_event.id %>
     <% end %>
