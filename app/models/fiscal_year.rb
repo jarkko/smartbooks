@@ -153,6 +153,12 @@ class FiscalYear < ActiveRecord::Base
     "#{description} (#{timeline})".strip
   end
 
+  def build_event(attrs)
+    event = events.build
+    event.attributes = attrs
+    event
+  end
+
   private
 
   def vat_balance_for(month)

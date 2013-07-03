@@ -24,8 +24,7 @@
   </head>
 
   <body>
-    <p style="color: green" id="notice"><%= flash[:notice] %></p>
-    <p style="color: red"><%= flash[:warning] %></p>
+    <%= render :partial => "shared/flashes" %>
 
     <%= yield %>
     

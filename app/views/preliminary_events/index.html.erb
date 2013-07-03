@@ -9,18 +9,18 @@
   </div>
 <% end %>
 
-<% @preliminary_events.each do |e| %>
+<% @preliminary_events.each_with_index do |e, idx| %>
   <div class="row">
     <div class="small-2 columns">
       <%= e.booking_date.to_s %>
     </div>
     <div class="small-6 columns">
-      <%= e.description %>
+      <%= e.description %> (<%= [e.counterpart, e.message].reject(&:blank?).join(", ") %>)
     </div>
     <div class="small-2 columns">
       <%= e.amount %>
     </div>
-    <%= link_to %[<i class="foundicon-down-arrow"></i>].html_safe, new_fiscal_year_event_path(@fiscal_year, :preliminary_event_id => e.id) %>
+    <%= link_to %[<i class="foundicon-down-arrow"></i>].html_safe, new_fiscal_year_event_path(@fiscal_year, :preliminary_event_id => e.id), :accesskey => (idx == 0 ? "n" : nil) %>
     <a class="small-1 columns" href>
       
     </a>

@@ -4,6 +4,9 @@ class PreliminaryEvent < ActiveRecord::Base
 
   belongs_to :account
   belongs_to :fiscal_year
+  belongs_to :event, :inverse_of => :preliminary_event
+
+  scope :unclaimed, where(:event_id => nil)
 
   monetize :amount_cents
 

@@ -27,7 +27,7 @@ class EventsController < ApplicationController
     @lines = []
     fetch_preliminary_data
 
-    4.times { @lines << EventLine.new }
+    6.times { @lines << EventLine.new }
   end
 
   # GET /events/1;edit
@@ -43,11 +43,10 @@ class EventsController < ApplicationController
   # POST /events.xml
   def create
     #@event = @fiscal_year.create_event(params[:event], params[:line])
-    @event = @fiscal_year.events.build(cleaned_up_event_params(params[:event]))
+    @event = @fiscal_year.build_event(cleaned_up_event_params(params[:event]))
     @event.save!
     flash[:notice] = 'Event was successfully created.'
-    redirect_to fiscal_year_events_url(:fiscal_year_id => @fiscal_year,
-                            :anchor => "event_#{@event.to_param}")
+    redirect_to after_create_url
 
   rescue ActiveRecord::RecordInvalid
     flash[:warning] = 'Saving event failed.'
@@ -86,7 +85,7 @@ class EventsController < ApplicationController
         @preliminary_event = @fiscal_year.preliminary_events.where(:id => params[:preliminary_event_id]).first
 
         if @preliminary_event
-          @event.description = @preliminary_event.description
+          @event.description = "#{@preliminary_event.description} (#{[@preliminary_event.counterpart, @preliminary_event.message].reject(&:blank?).join(", ")})"
           @event.event_date = @preliminary_event.booking_date
           @event.receipt_number = @preliminary_event.reference
           @lines << EventLine.new do |el|
@@ -94,6 +93,15 @@ class EventsController < ApplicationController
             el.amount = @preliminary_event.amount_cents
           end
         end
+      end
+    end
+
+    def after_create_url
+      if @pe = @event.preliminary_event
+        fiscal_year_account_preliminary_events_path(@fiscal_year, @pe.account)
+      else
+        fiscal_year_events_url(:fiscal_year_id => @fiscal_year,
+                               :anchor => "event_#{@event.to_param}")
       end
     end
 end
