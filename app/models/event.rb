@@ -9,8 +9,9 @@ class Event < ActiveRecord::Base
   has_one :preliminary_event, :inverse_of => :event
 
   validates_presence_of :event_date
+  before_validation :validate_event_line_sum
 
-  def validate
+  def validate_event_line_sum
     unless event_lines.map(&:amount).sum == 0
       errors.add :event_lines, "must add up to zero"
     end
