@@ -39,6 +39,7 @@ class FiscalYear < ActiveRecord::Base
      :purchases => "Aineet, tarvikkeet ja tavarat",
      :services => "Palvelut",
      :depreciation => "Poistot",
+     :personnel_expenses => "Henkilöstökulut",
      :other_expenses => "Liiketoiminnan muut kulut",
      :interest_expenses => "Korkokulut ja muut rahoituskulut",
      :taxes => "Verot",
@@ -70,6 +71,7 @@ class FiscalYear < ActiveRecord::Base
     purchases.result +
     services.result +
     depreciation.result +
+    personnel_expenses.result +
     other_expenses.result +
     interest_expenses.result
   end
