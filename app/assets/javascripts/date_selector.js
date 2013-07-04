@@ -31,6 +31,9 @@ DateSelector = Behavior.create({
   onfocus : function(e) {
     this.onclick(e);
   },
+  onblur : function(e) {
+    this.calendar.hide();
+  },
   getDate : function() {
     return this.options.getter(this.element.value) || new Date;
   }
