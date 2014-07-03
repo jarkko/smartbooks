@@ -101,12 +101,12 @@ class FiscalYear < ActiveRecord::Base
 
   def create_event(event_hsh, lines_hsh)
     logger.debug("*** Creating event with the following details: event: #{event_hsh.inspect}\n lines_hsh: #{lines_hsh.inspect}")
-    event = build_event(event_hsh, lines_hsh)
+    event = build_event_with_lines(event_hsh, lines_hsh)
     event.save
     return event
   end
 
-  def build_event(event_hsh, lines_hsh)
+  def build_event_with_lines(event_hsh, lines_hsh)
     event = events.build(event_hsh)
     lines = lines_hsh.respond_to?(:values) ? lines_hsh.values : lines_hsh
     lines.each do |line|

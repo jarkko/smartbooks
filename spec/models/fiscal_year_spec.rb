@@ -127,13 +127,17 @@ describe FiscalYear do
 
   describe "total_expenses" do
     before(:each) do
-      [@purchases, @services, @depreciation, @other_expenses, @interest_expenses].each do |account|
-        account.stub!(:result).and_return(10)
+      @expense_accounts = [@purchases, @services, @depreciation, @other_expenses, @personnel_expenses, @interest_expenses]
+      @total_expenses = 0
+      @expense_accounts.each do |account|
+        expense = rand(100)
+        @total_expenses += expense
+        account.stub!(:result).and_return(expense)
       end
     end
 
     it "should return the sum of all expenses" do
-      @fiscal_year.total_expenses.should == 50
+      @fiscal_year.total_expenses.should == @total_expenses
     end
   end
 
@@ -282,37 +286,37 @@ describe FiscalYear do
 
     describe "create_event" do
       before(:each) do
-        @fiscal_year.stub!(:build_event).and_return(@event)
+        @fiscal_year.stub!(:build_event_with_lines).and_return(@event)
       end
 
       it "should delegate to build_event" do
-        @fiscal_year.should_receive(:build_event).with(@event_hsh, @lines).
+        @fiscal_year.should_receive(:build_event_with_lines).with(@event_hsh, @lines).
           and_return(@event)
         @fiscal_year.create_event(@event_hsh, @lines).should == @event
       end
     end
 
-    describe "build_event" do
+    describe "build_event_with_lines" do
       it "should build new Event" do
         @events.should_receive(:build).
             and_return(@event)
-        @fiscal_year.build_event(@event_hsh, @lines)
+        @fiscal_year.build_event_with_lines(@event_hsh, @lines)
       end
 
       it "should add event lines to the event" do
         (@lines.keys - ["4"]).each do |line|
           @event.event_lines.should_receive(:build).with(@lines[line])
         end
-        @fiscal_year.build_event(@event_hsh, @lines)
+        @fiscal_year.build_event_with_lines(@event_hsh, @lines)
       end
 
       it "should not add line where both debit and credit are empty" do
         @event.event_lines.should_not_receive(:build).with(@lines["4"])
-        @fiscal_year.build_event(@event_hsh, @lines)
+        @fiscal_year.build_event_with_lines(@event_hsh, @lines)
       end
 
       it "should return the event" do
-        @fiscal_year.build_event(@event_hsh, @lines).should == @event
+        @fiscal_year.build_event_with_lines(@event_hsh, @lines).should == @event
       end
 
       describe "when lines an array" do
@@ -320,7 +324,7 @@ describe FiscalYear do
           @lines = @lines.values
         end
         it "should still return the event" do
-          @fiscal_year.build_event(@event_hsh, @lines).should == @event
+          @fiscal_year.build_event_with_lines(@event_hsh, @lines).should == @event
         end
       end
     end
