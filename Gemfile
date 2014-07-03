@@ -34,7 +34,6 @@ group :test, :development do
   gem "rspec-rails", "~> 2.0"
   gem 'autotest-standalone'
   gem 'autotest-rails-pure'
-  gem 'autotest-fsevent'
   gem "parallel_tests"
   gem "webrat"
   gem "factory_girl_rails"
