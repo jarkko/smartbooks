@@ -43,7 +43,7 @@ class Event < ActiveRecord::Base
   end
 
   def self.next_receipt_number
-    (maximum('receipt_number') + 1) || 1
+    (maximum('receipt_number').to_i + 1) || 1
   end
 
   def update_lines!(lines)

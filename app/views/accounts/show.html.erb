@@ -9,7 +9,7 @@
     <tr>
       <td><%= line.event.event_date %></td>
       <td><%= line.event.receipt_number %></td>
-      <td><%= line.event.description %></td>
+      <td><%= link_to line.event.description, [:edit, line.event.fiscal_year, line.event] %></td>
       <td><%= colored_sum(line.sum) %></td>
     </tr>
   <% end %>

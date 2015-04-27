@@ -5,7 +5,7 @@ gem 'rails', '~>3.2.13'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'mysql2'
+gem 'mysql2', '~> 0.3.18'
 gem 'acts_as_tree'
 gem 'json'
 gem 'hpricot'
@@ -38,6 +38,7 @@ group :test, :development do
   gem "webrat"
   gem "factory_girl_rails"
   gem "factory_girl"
+  gem "pry"
 end
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

@@ -77,6 +77,56 @@ Event.addBehavior({
     console.log(e.element())
     if (e.element().value == "") return;
     fillEmpty(e);
+  },
+  '#vat-24:click' : function (e) {
+    e.preventDefault();
+    var total = $$('#event_lines li')[1].select('.credit input')[0].value
+    var sans_vat = Math.round(-total / 1.24 * 100) / 100;
+    var vat = Math.round((-total - sans_vat) * 100) / 100;
+
+    var vat_line = findFirstEmptyLine();
+    fillFirstEmptyLine(vat * 100);
+    var new_line = findFirstEmptyLine();
+    fillFirstEmptyLine(sans_vat * 100);
+    var vat_account = accounts.find(function (a) {return /Arvonlis.veros/.match(a.title)});
+
+    vat_line.select('input[type=text]')[0].value = vat_account.title;
+    vat_line.select('input[type=hidden]')[0].value = vat_account.id;
+    new_line.select('input[type=text]')[0].focus();
+  },
+  '#vat-24-10:click' : function (e) {
+    e.preventDefault();
+    var total = $$('#event_lines li')[1].select('.credit input')[0].value.replace(",", ".")
+
+    var self_line = findFirstEmptyLine();
+    fillFirstEmptyLine(-10 * 100);
+    var self_account = accounts.find(function (a) {return /Yksityisnostot/.match(a.title)});
+    self_line.select('input[type=text]')[0].value = self_account.title;
+    self_line.select('input[type=hidden]')[0].value = self_account.id;
+
+    total = total - 10;
+
+    var sans_vat = Math.round(-total / 1.24 * 100) / 100;
+    var vat = Math.round((-total - sans_vat) * 100) / 100;
+
+    var vat_line = findFirstEmptyLine();
+    fillFirstEmptyLine(vat * 100);
+    var new_line = findFirstEmptyLine();
+    fillFirstEmptyLine(sans_vat * 100);
+    var vat_account = accounts.find(function (a) {return /Arvonlis.veros/.match(a.title)});
+
+    vat_line.select('input[type=text]')[0].value = vat_account.title;
+    vat_line.select('input[type=hidden]')[0].value = vat_account.id;
+    new_line.select('input[type=text]')[0].focus();
+  },
+  '.split-vat-button:click' : function (e) {
+    e.preventDefault();
+    var line = this.up('.event_line');
+    var value = getSum(line) / 100;
+    console.log("line:", line, "value", value)
+    var sans_vat = Math.round(value / 1.24 * 100) / 100;
+    fillValue(line, -sans_vat * 100);
+    fillFirstEmptyLine(-100 * (value - sans_vat));
   }
 });
 
@@ -86,9 +136,15 @@ function fillEmpty(e) {
   fillFirstEmptyLine(total, e);
 }
 
-function getSum() {
-  var debit_fields = $$('.debit input');
-  var credit_fields = $$('.credit input');
+function getSum(root_el) {
+  var root;
+  if (typeof root_el == "undefined") {
+    root = $('event_lines');
+  } else {
+    root = $(root_el);
+  }
+  var debit_fields = root.select('.debit input');
+  var credit_fields = root.select('.credit input');
 
   var credit_sum = credit_fields.inject(0, calculateSum);
   var debit_sum = debit_fields.inject(0, calculateSum);
@@ -96,8 +152,9 @@ function getSum() {
   //// console.log('Sum of debit fields is' + debit_sum);
   //// console.log('Sum of credit fields is' + credit_sum);
 
-  return debit_fields.inject(0, calculateSum) -
-         credit_fields.inject(0, calculateSum);
+  var total = (debit_fields.inject(0, calculateSum) -
+               credit_fields.inject(0, calculateSum));
+  return Math.round(total * 100) / 100;
 }
 
 function calculateSum(sum, n) {
@@ -132,6 +189,6 @@ function findFirstEmptyLine() {
 
 function fillValue(line, value) {
   var field_name = value < 0 ? 'debit' : 'credit';
-  //// console.log('Filling in ' + field_name + ' with ' + (value / 100) + '.');
+  console.log('Filling in ' + field_name + ' with ' + (value / 100) + '.');
   line.select('.' + field_name + ' input').first().value = value.abs() / 100;
 }

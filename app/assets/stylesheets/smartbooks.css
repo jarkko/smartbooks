@@ -82,6 +82,14 @@
 
 .debit {
 }
+
+.split-vat-button {
+  visibility:hidden;
+}
+
+#event_lines .row:hover .split-vat-button {
+  visibility: visible;
+}
 	
 	/* Date Picker */
   table.calendar {

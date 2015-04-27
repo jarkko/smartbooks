@@ -31,4 +31,9 @@ test:
   encoding: utf8
 
 production:
-  development
+  adapter: mysql2
+  database: smartbooks_development
+  username: root
+  password:
+  socket: /tmp/mysql.sock
+  encoding: utf8
