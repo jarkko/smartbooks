@@ -120,6 +120,7 @@ Event.addBehavior({
     new_line.select('input[type=text]')[0].focus();
   },
   '.split-vat-button:click' : function (e) {
+    console.log('.split-vat-button:click', e, e.element())
     e.preventDefault();
     var line = this.up('.event_line');
     var value = getSum(line) / 100;
@@ -190,5 +191,5 @@ function findFirstEmptyLine() {
 function fillValue(line, value) {
   var field_name = value < 0 ? 'debit' : 'credit';
   console.log('Filling in ' + field_name + ' with ' + (value / 100) + '.');
-  line.select('.' + field_name + ' input').first().value = value.abs() / 100;
+  line.select('.' + field_name + ' input').first().value = Math.round(value.abs()) / 100;
 }

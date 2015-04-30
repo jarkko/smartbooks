@@ -84,11 +84,11 @@
 }
 
 .split-vat-button {
-  visibility:hidden;
+  display: none;
 }
 
 #event_lines .row:hover .split-vat-button {
-  visibility: visible;
+  display: block;
 }
 	
 	/* Date Picker */
